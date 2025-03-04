@@ -1,0 +1,77 @@
+.admin-container {
+    min-height: 100vh;
+    background-color: #e4e4c1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 16px;
+}
+
+.admin-paper {
+    background-color: #c0b592 !important;
+    border-radius: 16px !important;
+    transition: all 0.3s ease;
+}
+
+.admin-title {
+    color: #684824;
+    font-weight: 600 !important;
+    margin-bottom: 24px !important;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.admin-textfield .MuiOutlinedInput-root {
+    background-color: #e4e4c1;
+    border-radius: 8px;
+}
+
+.admin-textfield .MuiOutlinedInput-root:hover .MuiOutlinedInput-notchedOutline {
+    border-color: #856c48;
+}
+
+.admin-textfield .MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline {
+    border-color: #684824;
+}
+
+.admin-textfield .MuiInputLabel-root {
+    color: #684824;
+}
+
+.admin-textfield .MuiInputLabel-root.Mui-focused {
+    color: #684824;
+}
+
+.admin-button {
+    background-color: #684824 !important;
+    color: #e4e4c1 !important;
+    padding: 12px !important;
+    font-size: 1.1rem !important;
+    text-transform: none !important;
+    border-radius: 8px !important;
+    margin-top: 24px !important;
+    transition: all 0.3s ease !important;
+}
+
+.admin-button:hover {
+    background-color: #856c48 !important;
+    box-shadow: 0 4px 8px rgba(104, 72, 36, 0.2) !important;
+}
+
+.error-message {
+    background-color: rgba(211, 47, 47, 0.1);
+    color: #d32f2f;
+    padding: 8px 16px;
+    border-radius: 4px;
+    margin-bottom: 16px;
+}
+
+@media (max-width: 600px) {
+    .admin-paper {
+        padding: 16px !important;
+    }
+
+    .admin-title {
+        font-size: 1.8rem !important;
+    }
+}

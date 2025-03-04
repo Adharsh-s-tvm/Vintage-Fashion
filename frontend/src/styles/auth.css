@@ -1,0 +1,59 @@
+.auth-container {
+    min-height: 100vh;
+    display: flex;
+    background: linear-gradient(135deg, #e4e4c1, #a2906d);
+}
+
+.auth-side {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 2rem;
+    transition: transform 0.5s ease-in-out;
+}
+
+.auth-form-container {
+    width: 100%;
+    max-width: 400px;
+}
+
+.advertisement {
+    padding: 2rem;
+    color: #684824;
+    text-align: center;
+}
+
+.advertisement h2 {
+    margin-bottom: 1rem;
+}
+
+.auth-link {
+    margin-top: 1rem;
+    text-align: center;
+    color: #684824;
+    text-decoration: none;
+}
+
+.auth-link:hover {
+    text-decoration: underline;
+}
+
+/* Animation classes */
+.slide-enter {
+    transform: translateX(100%);
+}
+
+.slide-enter-active {
+    transform: translateX(0);
+    transition: transform 500ms ease-in-out;
+}
+
+.slide-exit {
+    transform: translateX(0);
+}
+
+.slide-exit-active {
+    transform: translateX(-100%);
+    transition: transform 500ms ease-in-out;
+}
