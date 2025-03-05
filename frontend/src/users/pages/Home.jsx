@@ -1,6 +1,6 @@
 import React, { useEffect } from "react";
 import { AppBar, Toolbar, Typography, Container, Button, Box, Paper } from "@mui/material";
-import Header from "../../components/components/Header";
+import Header from "../components/userComponents/Header";
 import { useNavigate } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
 import { clearUserInfo } from "../../redux/slices/authSlice";
@@ -54,7 +54,7 @@ const Home = () => {
     }
   };
   const userName = userInfo?.name;
-
+  console.log(userInfo);
   useEffect(() => {
     if (!userInfo) {
       navigate('/login');

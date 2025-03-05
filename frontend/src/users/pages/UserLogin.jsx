@@ -4,7 +4,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { toast } from 'react-toastify';
 import axios from 'axios';
 import { CSSTransition } from "react-transition-group";
-import "../../styles/auth.css";
+import "../styles/auth.css";
 import { ToastContainer } from 'react-toastify';
 import { useDispatch, useSelector } from 'react-redux';
 import { setUserInfo } from '../../redux/slices/authSlice';
