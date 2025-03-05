@@ -6,18 +6,18 @@ import {
     DialogFooter,
     DialogHeader,
     DialogTitle
-} from '../components/ui/Dialog';
+} from '../ui/Dialog';
 import {
     Select,
     SelectContent,
     SelectItem,
     SelectTrigger,
     SelectValue,
-} from '../components/ui/Select';
-import { Button } from '../components/ui/Button';
-import { Input } from '../components/ui/Input';
-import { Label } from '../components/ui/Label';
-import { Switch } from '../components/ui/Switch';
+} from '../ui/Select';
+import { Button } from '../ui/Button';
+import { Input } from '../ui/Input';
+import { Label } from '../ui/Label';
+import { Switch } from '../ui/Switch';
 import { User, Upload } from 'lucide-react';
 
 export function UserFormModal({ open, onClose, onSubmit, user }) {

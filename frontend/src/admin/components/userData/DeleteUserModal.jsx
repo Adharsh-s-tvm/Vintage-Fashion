@@ -8,7 +8,7 @@ import {
     AlertDialogFooter,
     AlertDialogHeader,
     AlertDialogTitle,
-} from '../components/ui/AlertDialog';
+} from '../ui/AlertDialog';
 
 export function DeleteUserModal({ open, onClose, onConfirm, user }) {
     if (!user) return null;

@@ -1,15 +1,15 @@
 import React, { useState } from 'react';
 import { Bell, Search, Globe, ChevronDown, X } from 'lucide-react';
-import { cn } from '../lib/util';
-import { Button } from '../components/ui/Button';
-import { Input } from '../components/ui/Input';
+import { cn } from '../../lib/util';
+import { Button } from '../ui/Button';
+import { Input } from '../ui/Input';
 import { MobileSidebarTrigger } from './Sidebar';
 import {
     DropdownMenu,
     DropdownMenuContent,
     DropdownMenuItem,
     DropdownMenuTrigger,
-} from '../components/ui/DropDownMenu';
+} from '../ui/DropDownMenu';
 
 export function Navbar({ onMobileMenuClick }) {
     const [searchOpen, setSearchOpen] = useState(false);

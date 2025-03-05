@@ -6,15 +6,15 @@ import {
     TableHead,
     TableHeader,
     TableRow
-} from '../components/ui/Table';
+} from '../ui/Table';
 import {
     DropdownMenu,
     DropdownMenuContent,
     DropdownMenuItem,
     DropdownMenuTrigger,
-} from '../components/ui/DropDownMenu';
-import { Button } from '../components/ui/Button';
-import { Input } from '../components/ui/Input';
+} from '../ui/DropDownMenu';
+import { Button } from '../ui/Button';
+import { Input } from '../ui/Input';
 import {
     CheckCircle2,
     XCircle,
@@ -23,7 +23,7 @@ import {
     Filter,
     UserPlus
 } from 'lucide-react';
-import { cn } from '../lib/util';
+import { cn } from '../../lib/util';
 
 export function UsersTable({ users: initialUsers, onNewUser, onEditUser, onDeleteUser }) {
     const [users, setUsers] = useState(initialUsers);

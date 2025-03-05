@@ -11,8 +11,8 @@ import {
     Crown,
     Menu
 } from 'lucide-react';
-import { cn } from '../lib/util';
-import { Button } from '../components/ui/Button';
+import { cn } from '../../lib/util';
+import { Button } from '../ui/Button';
 
 export function Sidebar({ className, mobileOpen, onMobileClose }) {
     const [collapsed, setCollapsed] = useState(false);

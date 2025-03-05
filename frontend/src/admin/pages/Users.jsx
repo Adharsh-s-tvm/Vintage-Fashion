@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
-import { Layout } from '../layout/Layout';
-import { UsersTable } from '../userData/UserTable';
-import { UserFormModal } from '../userData/UserFormModal';
-import { DeleteUserModal } from '../userData/DeleteUserModal';
+import { Layout } from '../components/layout/Layout';
+import { UsersTable } from '../components/userData/UserTable';
+import { UserFormModal } from '../components/userData/UserFormModal';
+import { DeleteUserModal } from '../components/userData/DeleteUserModal';
 import { useToast } from '../../hooks/useToast';
 
 // Mock data
