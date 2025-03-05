@@ -36,7 +36,7 @@ export function Navbar({ onMobileMenuClick }) {
                     "hidden md:block",
                     searchOpen ? "w-full max-w-xl" : "w-80",
                 )}>
-                    <div className="relative">
+                    {/* <div className="relative">
                         <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
                         <Input
                             type="search"
@@ -55,7 +55,7 @@ export function Navbar({ onMobileMenuClick }) {
                                 <X className="h-4 w-4" />
                             </Button>
                         )}
-                    </div>
+                    </div> */}
                 </div>
 
                 {/* Right side */}

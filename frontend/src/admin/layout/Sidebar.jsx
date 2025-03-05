@@ -148,7 +148,7 @@ export function Sidebar({ className, mobileOpen, onMobileClose }) {
                 </ul>
             </nav>
 
-            <div className={cn(
+            {/* <div className={cn(
                 "p-4 border-t border-gray-100",
                 collapsed ? "items-center" : ""
             )}>
@@ -181,7 +181,7 @@ export function Sidebar({ className, mobileOpen, onMobileClose }) {
                         </div>
                     )}
                 </div>
-            </div>
+            </div> */}
         </aside>
     );
 }

@@ -10,9 +10,9 @@ function AdminRoutes() {
   return (
 
     <Routes>
-      <Route path='/signin' element={<AdminSignIn />} />
-      <Route path='/signup' element={<AdminSignUp/>} />
       <Route path='/' element={<Dashboard/>} />
+      <Route path='/signin' element={<AdminSignIn />} />
+      {/* <Route path='/signup' element={<AdminSignUp/>} /> */}
       <Route path='/product' element={<Products/>} />
       <Route path='/users' element={<Users/>} />
     </Routes>

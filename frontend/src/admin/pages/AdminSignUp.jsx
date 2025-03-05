@@ -1,5 +1,4 @@
 import React, { useState } from 'react'
-import { Layout } from '../layout/Layout';
 import { Label } from '../components/ui/Label';
 import { ArrowRight, Mail, Lock, User, EyeOff, Eye } from 'lucide-react';
 import { Input } from '../components/ui/Input';
@@ -20,7 +19,6 @@ function AdminSignUp() {
     };
 
   return (
-    <Layout>
             <div className="flex items-center justify-center min-h-[80vh]">
                 <div className="bg-white p-8 rounded-xl shadow-sm border border-gray-100 w-full max-w-md animate-fade-in">
                     <div className="text-center mb-8">
@@ -134,7 +132,6 @@ function AdminSignUp() {
                     </div>
                 </div>
             </div>
-        </Layout>
   )
 }
 
