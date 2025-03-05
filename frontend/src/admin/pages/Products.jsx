@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
-import { Layout } from '../components/layout/Layout';
-import { ProductsTable } from '../components/products/ProductTable';
-import { CreateProductDialog } from '../components/products/CreateProductDialog.jsx';
-import { Button } from '../components/ui/Button';
+import { Layout } from '../layout/Layout';
+import { ProductsTable } from '../products/ProductTable';
+import { CreateProductDialog } from '../products/CreateProductDialog.jsx';
+import { Button } from '../../ui/Button';
 import { Plus } from 'lucide-react';
 
 function Products() {

@@ -1,8 +1,8 @@
 import React from 'react';
-import { Layout } from '../components/layout/Layout';
-import { StatsCard } from '../components/dashboard/StatsCard';
-import { PieChartCard } from '../components/dashboard/PieChartCard';
-import { BarChartCard } from '../components/dashboard/BarChartCard';
+import { Layout } from '../layout/Layout';
+import { StatsCard } from '../dashboard/StatsCard';
+import { PieChartCard } from '../dashboard/PieChartCard';
+import { BarChartCard } from '../dashboard/BarChartCard';
 import { ShoppingBag, Users, ShoppingCart, MessageCircle } from 'lucide-react';
 
 const visitsData = [

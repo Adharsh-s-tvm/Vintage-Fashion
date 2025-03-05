@@ -5,19 +5,19 @@ import AdminSignIn from './AdminSignIn'
 import Dashboard from './Index'
 import Products from './Products'
 import Users from './Users'
-import NotFound from './NotFound'
+import NotFound from '../../ui/NotFound'
 import Blog from './Blog'
 
 function AdminRoutes() {
   return (
 
     <Routes>
-      <Route path='/' element={<Dashboard/>} />
+      <Route path='/' element={<Dashboard />} />
       <Route path='/signin' element={<AdminSignIn />} />
-      <Route path='/products' element={<Products/>} />
-      <Route path='/users' element={<Users/>} />
-      <Route path='/blog' element={<Blog/>} />
-      <Route path='/*' element={<NotFound/>} />
+      <Route path='/products' element={<Products />} />
+      <Route path='/users' element={<Users />} />
+      <Route path='/blog' element={<Blog />} />
+      <Route path='/*' element={<NotFound redirectPageType={'admin'} />} />
 
 
 
