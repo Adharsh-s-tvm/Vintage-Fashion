@@ -32,18 +32,18 @@ export function Sidebar({ className, mobileOpen, onMobileClose }) {
         {
             icon: LayoutDashboard,
             label: 'Dashboard',
-            path: '/',
+            path: '/admin',
             exact: true
         },
         {
             icon: Users,
             label: 'Users',
-            path: '/users'
+            path: '/admin/users'
         },
         {
             icon: ShoppingBag,
             label: 'Products',
-            path: '/products',
+            path: '/admin/products',
             badge: {
                 count: 24,
                 color: 'badge-info'
@@ -52,17 +52,17 @@ export function Sidebar({ className, mobileOpen, onMobileClose }) {
         {
             icon: FileText,
             label: 'Blog',
-            path: '/blog'
+            path: '/admin/blog'
         },
         {
             icon: LogIn,
             label: 'Sign In',
-            path: '/signin'
+            path: '/admin/signin'
         },
         {
             icon: AlertCircle,
             label: '404',
-            path: '/404'
+            path: '/admin/404'
         },
     ];
 
