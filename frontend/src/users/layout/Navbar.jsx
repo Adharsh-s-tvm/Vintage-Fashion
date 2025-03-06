@@ -39,8 +39,8 @@ export function Navbar() {
         <div className="flex justify-between h-16 items-center">
           {/* Logo */}
           <div className="flex-shrink-0 flex items-center">
-            <Link to="/ecommerce" className="text-xl font-bold text-gray-900">
-              JACKET<span className="text-primary">HUB</span>
+            <Link to="/" className="text-xl font-bold text-900">
+              VINT<span className="text-danger">AGE</span>
             </Link>
           </div>
 
@@ -66,14 +66,14 @@ export function Navbar() {
               <Search className="h-5 w-5" />
             </button>
 
-            <Link to="/ecommerce/wishlist" className="p-2 text-gray-500 hover:text-primary relative group">
+            <Link to="/wishlist" className="p-2 text-gray-500 hover:text-primary relative group">
               <Heart className="h-5 w-5" />
               <span className="absolute -top-1 -right-1 bg-primary text-white text-xs rounded-full h-4 w-4 flex items-center justify-center">
                 2
               </span>
             </Link>
 
-            <Link to="/ecommerce/cart" className="p-2 text-gray-500 hover:text-primary relative group">
+            <Link to="/cart" className="p-2 text-gray-500 hover:text-primary relative group">
               <ShoppingBag className="h-5 w-5" />
               <span className="absolute -top-1 -right-1 bg-primary text-white text-xs rounded-full h-4 w-4 flex items-center justify-center">
                 3
@@ -103,7 +103,7 @@ export function Navbar() {
                     <Button
                       className="w-full"
                       size="sm"
-                      onClick={() => navigate('/ecommerce/cart')}
+                      onClick={() => navigate('/cart')}
                     >
                       View Cart
                     </Button>
@@ -111,7 +111,7 @@ export function Navbar() {
                       variant="outline"
                       className="w-full"
                       size="sm"
-                      onClick={() => navigate('/ecommerce/checkout')}
+                      onClick={() => navigate('/checkout')}
                     >
                       Checkout
                     </Button>
@@ -127,15 +127,15 @@ export function Navbar() {
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="w-56">
-                <DropdownMenuItem onClick={() => navigate('/ecommerce/dashboard')}>
+                <DropdownMenuItem onClick={() => navigate('/dashboard')}>
                   <UserCircle className="mr-2 h-4 w-4" />
                   <span>My Account</span>
                 </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => navigate('/ecommerce/orders')}>
+                <DropdownMenuItem onClick={() => navigate('/orders')}>
                   <ShoppingBag className="mr-2 h-4 w-4" />
                   <span>My Orders</span>
                 </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => navigate('/ecommerce/wishlist')}>
+                <DropdownMenuItem onClick={() => navigate('/wishlist')}>
                   <Heart className="mr-2 h-4 w-4" />
                   <span>My Wishlist</span>
                 </DropdownMenuItem>

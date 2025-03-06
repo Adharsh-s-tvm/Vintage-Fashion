@@ -12,6 +12,7 @@ function UserSignUp() {
     const [password, setPassword] = useState('');
     const [showPassword, setShowPassword] = useState(false);
 
+
     const handleSubmit = (e) => {
         e.preventDefault();
         // For demo purposes - just show a toast
