@@ -31,8 +31,8 @@ export function UsersTable({ users: initialUsers, onNewUser, onEditUser, onDelet
     const [filter, setFilter] = useState('all');
 
 
-    useEffect(()=>{
-        if(initialUsers){
+    useEffect(() => {
+        if (initialUsers) {
             setUsers(initialUsers)
         }
     })
@@ -45,9 +45,9 @@ export function UsersTable({ users: initialUsers, onNewUser, onEditUser, onDelet
         const matchesSearch =
             user.firstname.toLowerCase().includes(searchTerm.toLowerCase()) ||
             user.lasttname.toLowerCase().includes(searchTerm.toLowerCase()) ||
-            user.email.toLowerCase().includes(searchTerm.toLowerCase()) ;
-            // user.company.toLowerCase().includes(searchTerm.toLowerCase()) ||
-            // user.role.toLowerCase().includes(searchTerm.toLowerCase());
+            user.email.toLowerCase().includes(searchTerm.toLowerCase());
+        // user.company.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        // user.role.toLowerCase().includes(searchTerm.toLowerCase());
 
         // Status filter
         const matchesFilter =
@@ -116,11 +116,11 @@ export function UsersTable({ users: initialUsers, onNewUser, onEditUser, onDelet
                     <TableHeader>
                         <TableRow className="bg-gray-50 hover:bg-gray-50">
                             <TableHead className="w-12">Profile</TableHead>
-                            <TableHead>Name</TableHead>
-                            <TableHead className="hidden md:table-cell">Company</TableHead>
-                            <TableHead className="hidden md:table-cell">Role</TableHead>
+                            <TableHead className="text-center">Name</TableHead>
+                            <TableHead className="w-10" >Email</TableHead>
+                            <TableHead className="hidden md:table-cell text-center">Role</TableHead>
                             <TableHead className="hidden md:table-cell">Verified</TableHead>
-                            <TableHead>Status</TableHead>
+                            <TableHead className="hidden md:table-cell">Status</TableHead>
                             <TableHead className="w-12 text-right">Actions</TableHead>
                         </TableRow>
                     </TableHeader>
@@ -138,11 +138,9 @@ export function UsersTable({ users: initialUsers, onNewUser, onEditUser, onDelet
                                         </div>
                                     </TableCell>
                                     <TableCell>
-                                        <div className="font-medium">{user.name}</div>
-                                        <div className="text-sm text-gray-500 md:hidden">{user.company}</div>
-                                        <div className="text-xs text-gray-400">{user.email}</div>
+                                        <div className="font-medium">{user.firstname} {user.lastname}</div>
                                     </TableCell>
-                                    <TableCell className="hidden md:table-cell">{user.company}</TableCell>
+                                    <TableCell>{user.email}</TableCell>
                                     <TableCell className="hidden md:table-cell">
                                         <span className="px-2 py-1 rounded-full text-xs font-medium bg-gray-100">
                                             {user.role}
@@ -163,6 +161,7 @@ export function UsersTable({ users: initialUsers, onNewUser, onEditUser, onDelet
                                             {user.status === 'active' ? 'Active' : 'Banned'}
                                         </span>
                                     </TableCell>
+
                                     <TableCell className="text-right">
                                         <DropdownMenu>
                                             <DropdownMenuTrigger asChild>
@@ -199,6 +198,6 @@ export function UsersTable({ users: initialUsers, onNewUser, onEditUser, onDelet
                     </TableBody>
                 </Table>
             </div>
-        </div>
+        </div >
     );
 } 
