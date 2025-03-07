@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Input } from '../../ui/Input';
 import { Button } from '../../ui/Button';
 import { Label } from '../../ui/Label';
@@ -48,6 +48,14 @@ export default function SignIn() {
             setIsLoading(false);
         }
     };
+
+    useEffect(() => {
+        const adminData = JSON.parse(localStorage.getItem('adminInfo'));
+        if (adminData) {
+            navigate('/admin');
+        }
+    }, [navigate]);
+
 
     return (
         <div className="flex items-center justify-center min-h-[80vh]">

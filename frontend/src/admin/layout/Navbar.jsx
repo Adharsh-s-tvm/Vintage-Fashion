@@ -37,10 +37,8 @@ export function Navbar({ onMobileMenuClick }) {
         if (adminInfo && jwt) {
             dispatch(setAdminInfo(adminInfo));
         }
-        if (adminInfo) {
-            navigate('/admin');
-        }
-    }, [dispatch, navigate]);
+
+    }, [dispatch]);
 
 
     const handleLogout = () => {
