@@ -1,11 +1,11 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, use } from 'react';
 import { Input } from '../../ui/Input';
 import { Button } from '../../ui/Button';
 import { Label } from '../../ui/Label';
 import { Link, useNavigate } from 'react-router-dom';
 import { ArrowRight, Mail, Lock, EyeOff, Eye } from 'lucide-react';
 import { toast } from 'sonner';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { setAdminInfo } from '../../redux/slices/adminSlice';
 import { loginAdmin } from '../../redux/api/adminApi';
 
@@ -43,12 +43,14 @@ export default function SignIn() {
         }
     };
 
-    // useEffect(() => {
-    //     const adminData = JSON.parse(localStorage.getItem('adminInfo'));
-    //     if (!adminData) {
-    //         navigate('/admin/signin');
-    // }
-    // }, [navigate]);
+    const admin = useSelector(state => state.admin.data)
+    useEffect(() => {
+        if (!admin) {
+            navigate('/admin/signin');
+        } else {
+            navigate('/admin')
+        }
+    }, []);
 
 
     return (

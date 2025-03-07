@@ -80,7 +80,7 @@ export default function Users() {
     };
 
     return (
-        <Layout>
+        <>
             <div className="mb-6">
                 <h1 className="text-2xl md:text-3xl font-bold text-gray-900 animate-fade-in">User Management</h1>
             </div>
@@ -107,6 +107,6 @@ export default function Users() {
                 onConfirm={handleConfirmDelete}
                 user={selectedUser}
             />
-        </Layout>
+        </>
     );
 }

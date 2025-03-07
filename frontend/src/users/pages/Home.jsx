@@ -14,7 +14,7 @@ export default function ECommerce() {
     <Layout>
       <HeroSection />
       <div className="container mx-auto my-8 flex justify-end">
-        <Link to="/ecommerce/products">
+        <Link to="/products">
           <Button className="flex items-center gap-2">
             View All Products <ChevronRight className="h-4 w-4" />
           </Button>

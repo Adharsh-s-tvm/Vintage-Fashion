@@ -7,16 +7,17 @@ import Products from './Products'
 import Users from './Users'
 import NotFound from '../../ui/NotFound'
 import Blog from './Blog'
+import { AdminLayout } from '../layout/AdminLayout'
 
 function AdminRoutes() {
   return (
-
     <Routes>
-      <Route path='/' element={<Dashboard />} />
       <Route path='/signin' element={<AdminSignIn />} />
-      <Route path='/products' element={<Products />} />
-      <Route path='/users' element={<Users />} />
-      <Route path='/blog' element={<Blog />} />
+      <Route path='/' element={<AdminLayout />}>
+        <Route index element={<Dashboard />} />
+        <Route path='products' element={<Products />} />
+        <Route path='users' element={<Users />} />
+      </Route>
       <Route path='/*' element={<NotFound redirectPageType={'admin'} />} />
       {/* <Route path='/signup' element={<AdminSignUp/>} /> */}
     </Routes>

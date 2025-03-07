@@ -274,7 +274,7 @@ const ProductListing = () => {
 
     return (
         <Layout showSidebar={true} sidebarContent={sidebarContent}>
-            <div className="mb-8">
+            <div className="mb-4">
                 <h1 className="text-3xl font-bold mb-2">All Jackets</h1>
                 <p className="text-gray-600">
                     {sortedProducts.length} products found

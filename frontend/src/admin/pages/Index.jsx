@@ -5,26 +5,26 @@ import { PieChartCard } from '../dashboard/PieChartCard';
 import { BarChartCard } from '../dashboard/BarChartCard';
 import { ShoppingBag, Users, ShoppingCart, MessageCircle } from 'lucide-react';
 
-// const visitsData = [
-//     { name: 'North America', value: 35, color: '#4E80EE' },
-//     { name: 'Europe', value: 30, color: '#8B5CF6' },
-//     { name: 'Asia', value: 25, color: '#F59E0B' },
-//     { name: 'Africa', value: 10, color: '#EF4444' },
-// ];
+const visitsData = [
+    { name: 'North America', value: 35, color: '#4E80EE' },
+    { name: 'Europe', value: 30, color: '#8B5CF6' },
+    { name: 'Asia', value: 25, color: '#F59E0B' },
+    { name: 'Africa', value: 10, color: '#EF4444' },
+];
 
-// const websiteVisitsData = [
-//     { name: 'Jan', teamA: 35, teamB: 28 },
-//     { name: 'Feb', teamA: 45, teamB: 31 },
-//     { name: 'Mar', teamA: 40, teamB: 35 },
-//     { name: 'Apr', teamA: 30, teamB: 40 },
-//     { name: 'May', teamA: 48, teamB: 42 },
-//     { name: 'Jun', teamA: 52, teamB: 48 },
-// ];
+const websiteVisitsData = [
+    { name: 'Jan', teamA: 35, teamB: 28 },
+    { name: 'Feb', teamA: 45, teamB: 31 },
+    { name: 'Mar', teamA: 40, teamB: 35 },
+    { name: 'Apr', teamA: 30, teamB: 40 },
+    { name: 'May', teamA: 48, teamB: 42 },
+    { name: 'Jun', teamA: 52, teamB: 48 },
+];
 
 export default function Dashboard() {
     return (
-        <Layout>
-            {/* <div className="mb-6">
+        <>
+            <div className="mb-6">
                 <h1 className="text-2xl md:text-3xl font-bold text-gray-900 animate-fade-in">Dashboard</h1>
                 <p className="text-gray-500 mt-1 animate-fade-in">Overview of your business performance</p>
             </div>
@@ -73,7 +73,7 @@ export default function Dashboard() {
                     title="Website Visits"
                     data={websiteVisitsData}
                 />
-            </div> */}
-        </Layout>
+            </div>
+        </>
     );
 } 

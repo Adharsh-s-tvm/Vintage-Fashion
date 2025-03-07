@@ -9,7 +9,7 @@ function Products() {
     const [open, setOpen] = useState(false);
 
     return (
-        <Layout>
+        <>
             <div className="mb-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
                 <div>
                     <h1 className="text-2xl md:text-3xl font-bold text-gray-900 animate-fade-in">Products</h1>
@@ -26,7 +26,7 @@ function Products() {
 
             <ProductsTable />
             <CreateProductDialog open={open} onOpenChange={setOpen} />
-        </Layout>
+        </>
     );
 }
 

@@ -10,6 +10,7 @@ import WishList from './WishList'
 import Orders from './Orders'
 import UserDashboard from './UserDashboard'
 import ProductDetail from './ProductDetail'
+import ProtectedRoute from '../../utils/ProtectedRoute'
 
 function UserRoutes() {
   return (
@@ -18,13 +19,16 @@ function UserRoutes() {
         <Route path='/' element={<Home />} />
         <Route path='/login' element={<UserLogin />} />
         <Route path='/signup' element={<UserSignUp />} />
-        <Route path='/products' element={<ProductList />} />
-        <Route path='/cart' element={<Cart />} />
-        <Route path='/wishlist' element={<WishList />} />
-        <Route path='/orders' element={<Orders />} />
-        <Route path='/dashboard' element={<UserDashboard />} />
         <Route path='/products/:id' element={<ProductDetail />} />
+        <Route path='/products' element={<ProductList />} />
         <Route path='/*' element={<NotFound />} />
+
+        <Route element={<ProtectedRoute />}>
+          <Route path='/cart' element={<Cart />} />
+          <Route path='/wishlist' element={<WishList />} />
+          <Route path='/orders' element={<Orders />} />
+          <Route path='/dashboard' element={<UserDashboard />} />
+        </Route>
       </Routes>
     </>
   )
