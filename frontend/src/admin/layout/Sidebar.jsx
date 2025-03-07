@@ -49,21 +49,21 @@ export function Sidebar({ className, mobileOpen, onMobileClose }) {
                 color: 'badge-info'
             }
         },
-        {
-            icon: FileText,
-            label: 'Blog',
-            path: '/admin/blog'
-        },
+        // {
+        //     icon: FileText,
+        //     label: 'Blog',
+        //     path: '/admin/blog'
+        // },
         // {
         //     icon: LogIn,
         //     label: 'Sign In',
         //     path: '/admin/signin'
         // },
-        {
-            icon: AlertCircle,
-            label: '404',
-            path: '/admin/404'
-        },
+        // {
+        //     icon: AlertCircle,
+        //     label: '404',
+        //     path: '/admin/404'
+        // },
     ];
 
     return (

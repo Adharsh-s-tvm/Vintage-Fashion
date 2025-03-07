@@ -24,15 +24,9 @@ export default function SignIn() {
             const data = await loginAdmin(email, password);
             console.log('Login Data:', data);
 
-            // Check if data contains the expected fields
             if (data) {
-                // Store admin data in Redux
                 dispatch(setAdminInfo(data));
-
-                // Store admin data in local storage
                 localStorage.setItem('adminInfo', JSON.stringify(data));
-
-                // Also store JWT if available
                 if (data.token) {
                     localStorage.setItem('jwt', data.token);
                 }
@@ -52,7 +46,9 @@ export default function SignIn() {
     useEffect(() => {
         const adminData = JSON.parse(localStorage.getItem('adminInfo'));
         if (adminData) {
-            navigate('/admin');
+            navigate('/admin')
+        } else {
+            navigate('/admin/signin');
         }
     }, [navigate]);
 
@@ -61,8 +57,7 @@ export default function SignIn() {
         <div className="flex items-center justify-center min-h-[80vh]">
             <div className="bg-white p-8 rounded-xl shadow-sm border border-gray-100 w-full max-w-md animate-fade-in">
                 <div className="text-center mb-8">
-                    <h1 className="text-2xl font-bold mb-2">Welcome back</h1>
-                    <p className="text-gray-500">Sign in to your account to continue</p>
+                    <h1 className="text-2xl font-bold mb-2">Admin Login</h1>
                 </div>
 
                 <form onSubmit={handleSubmit} className="space-y-6">

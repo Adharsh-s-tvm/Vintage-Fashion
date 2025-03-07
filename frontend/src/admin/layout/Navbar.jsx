@@ -25,10 +25,10 @@ export function Navbar({ onMobileMenuClick }) {
 
     // Check authentication status and redirect if needed
     useEffect(() => {
-        if (!isAuthenticated && location.pathname !== '/admin/signin') {
+        if (!isAuthenticated ) {
             navigate('/admin/signin');
         }
-    }, [isAuthenticated, navigate, location.pathname]);
+    }, [isAuthenticated, navigate]);
 
     useEffect(() => {
         const adminInfo = JSON.parse(localStorage.getItem('adminInfo'));
@@ -42,6 +42,8 @@ export function Navbar({ onMobileMenuClick }) {
 
 
     const handleLogout = () => {
+        console.log("Called");
+        
         logoutAdmin()
             .then(() => {
                 dispatch(clearAdminInfo());
