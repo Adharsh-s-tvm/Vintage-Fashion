@@ -2,20 +2,47 @@ import React, { useState } from 'react';
 import { Input } from '../../ui/Input';
 import { Button } from '../../ui/Button';
 import { Label } from '../../ui/Label';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { ArrowRight, Mail, Lock, EyeOff, Eye } from 'lucide-react';
 import { toast } from 'sonner';
+import { loginUser } from '../../redux/api/userApi';
+import { useDispatch } from 'react-redux';
+import { setUserInfo } from '../../redux/slices/authSlice';
 
 export default function SignIn() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    
-    toast.success('Successfully signed in!');
-  };
+
+const handleSubmit = async (e) => {
+        e.preventDefault();
+        try {
+            setIsLoading(true);
+            const data = await loginUser(email, password);
+            console.log('Login Data:', data);
+
+            if (data) {
+                dispatch(setUserInfo(data));
+                localStorage.setItem('userInfo', JSON.stringify(data));
+                if (data.token) {
+                    localStorage.setItem('jwt', data.token);
+                }
+
+                toast.success('Successfully signed in!');
+                navigate('/');
+            } else {
+                throw new Error('Login failed: No data received');
+            }
+        } catch (error) {
+            toast.error('Login failed: ' + error.response?.data?.message || error.message);
+        } finally {
+            setIsLoading(false);
+        }
+    };
 
   return (
     <div className="flex items-center justify-center min-h-[80vh]">

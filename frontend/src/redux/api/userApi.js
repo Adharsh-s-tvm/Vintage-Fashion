@@ -1,9 +1,9 @@
 import { api } from '../../lib/api';
 import axios from 'axios';
 
-const API_URL = `${api}/admin`;
+const API_URL = `${api}`;
 
-export const loginAdmin = async (email, password) => {
+export const loginUser = async (email, password) => {
     try {
         const response = await axios.post(
             `${API_URL}/login`,
@@ -26,14 +26,16 @@ export const loginAdmin = async (email, password) => {
     }
 };
 
-export const logoutAdmin = async () => {
+
+
+export const logoutUser = async () => {
     try {
         const response = await axios.post(
             `${API_URL}/logout`,
             {},
             { withCredentials: true }
         );
-        localStorage.removeItem('adminInfo');
+        localStorage.removeItem('userInfo');
         localStorage.removeItem('jwt');
 
         return response.data;
@@ -42,18 +44,3 @@ export const logoutAdmin = async () => {
         throw error;
     }
 };
-
-export const getDashboard = async () => {
-    try {
-        const response = await axios.get(
-            `${API_URL}/dashboard`,
-            { withCredentials: true }
-        );
-        return response.data;
-    } catch (error) {
-        console.error('Dashboard fetch error:', error);
-        throw error;
-    }
-};
-
-

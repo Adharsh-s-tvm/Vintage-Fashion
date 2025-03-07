@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import {
   Search,
@@ -24,8 +24,14 @@ export function Navbar() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
   const navigate = useNavigate();
-  
   const { user } = useSelector((state) => state.auth); // Get user from Redux
+  const [storedUser, setStoredUser] = useState(null);
+
+  // Check local storage for user info on mount
+  useEffect(() => {
+    const storedUserInfo = JSON.parse(localStorage.getItem('userInfo'));
+    setStoredUser(storedUserInfo);
+  }, []);
 
   const categories = [
     { name: 'All', href: '#' },
@@ -59,8 +65,8 @@ export function Navbar() {
             ))}
           </nav>
 
-          {/* If user exists, show wishlist, cart & user menu. Else, show sign-in button */}
-          {user ? (
+          {/* Check if user is logged in */}
+          {user || storedUser ? (
             <div className="hidden md:flex items-center space-x-4">
               <button
                 className="p-2 text-gray-500 hover:text-primary"
@@ -102,7 +108,14 @@ export function Navbar() {
                     <Heart className="mr-2 h-4 w-4" />
                     <span>My Wishlist</span>
                   </DropdownMenuItem>
-                  <DropdownMenuItem onClick={() => navigate('/signin')}>
+                  <DropdownMenuItem
+                    onClick={() => {
+                      localStorage.removeItem('userInfo');
+                      localStorage.removeItem('jwt');
+                      navigate('/login');
+                      window.location.reload();
+                    }}
+                  >
                     <LogOut className="mr-2 h-4 w-4" />
                     <span>Logout</span>
                   </DropdownMenuItem>
@@ -110,7 +123,7 @@ export function Navbar() {
               </DropdownMenu>
             </div>
           ) : (
-            <Button onClick={() => navigate('/signin')} variant="outline">
+            <Button onClick={() => navigate('/login')} variant="outline">
               Sign In
             </Button>
           )}

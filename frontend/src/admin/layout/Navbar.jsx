@@ -30,7 +30,7 @@ export function Navbar({ onMobileMenuClick }) {
             navigate('/admin/signin');
         }
     }, [isAuthenticated, navigate]);
-    
+
 
     useEffect(() => {
         const adminInfo = JSON.parse(localStorage.getItem('adminInfo'));
@@ -45,7 +45,7 @@ export function Navbar({ onMobileMenuClick }) {
 
     const handleLogout = () => {
         console.log("Called");
-        
+
         logoutAdmin()
             .then(() => {
                 dispatch(clearAdminInfo());
