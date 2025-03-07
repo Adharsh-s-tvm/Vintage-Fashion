@@ -10,15 +10,11 @@ export const loginAdmin = async (email, password) => {
             { email, password },
             { withCredentials: true }
         );
-
-        // If the token is in the response body but not automatically saved as a cookie
         if (response.data && !response.data.token) {
-            // Extract token from cookies if it's not in the response data
             const cookies = document.cookie.split(';');
             const tokenCookie = cookies.find(cookie => cookie.trim().startsWith('token='));
             if (tokenCookie) {
                 const token = tokenCookie.split('=')[1];
-                // Add token to the response data
                 response.data.token = token;
             }
         }
@@ -37,8 +33,6 @@ export const logoutAdmin = async () => {
             {},
             { withCredentials: true }
         );
-
-        // Clear local storage
         localStorage.removeItem('userInfo');
         localStorage.removeItem('jwt');
 
@@ -61,3 +55,5 @@ export const getDashboard = async () => {
         throw error;
     }
 };
+
+

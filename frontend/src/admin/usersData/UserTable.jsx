@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
     Table,
     TableBody,
@@ -30,14 +30,24 @@ export function UsersTable({ users: initialUsers, onNewUser, onEditUser, onDelet
     const [searchTerm, setSearchTerm] = useState('');
     const [filter, setFilter] = useState('all');
 
+
+    useEffect(()=>{
+        if(initialUsers){
+            setUsers(initialUsers)
+        }
+    })
+
+    console.log("Initial Users:", initialUsers);
+
     // Filter users based on search term and filter
     const filteredUsers = users.filter(user => {
         // Search filter
         const matchesSearch =
-            user.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-            user.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
-            user.company.toLowerCase().includes(searchTerm.toLowerCase()) ||
-            user.role.toLowerCase().includes(searchTerm.toLowerCase());
+            user.firstname.toLowerCase().includes(searchTerm.toLowerCase()) ||
+            user.lasttname.toLowerCase().includes(searchTerm.toLowerCase()) ||
+            user.email.toLowerCase().includes(searchTerm.toLowerCase()) ;
+            // user.company.toLowerCase().includes(searchTerm.toLowerCase()) ||
+            // user.role.toLowerCase().includes(searchTerm.toLowerCase());
 
         // Status filter
         const matchesFilter =

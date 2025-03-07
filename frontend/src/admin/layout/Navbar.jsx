@@ -25,10 +25,12 @@ export function Navbar({ onMobileMenuClick }) {
 
     // Check authentication status and redirect if needed
     useEffect(() => {
-        if (!isAuthenticated ) {
+        const adminInfo = JSON.parse(localStorage.getItem('adminInfo'));
+        if (!adminInfo) {
             navigate('/admin/signin');
         }
     }, [isAuthenticated, navigate]);
+    
 
     useEffect(() => {
         const adminInfo = JSON.parse(localStorage.getItem('adminInfo'));

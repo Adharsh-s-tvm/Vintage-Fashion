@@ -43,14 +43,12 @@ export default function SignIn() {
         }
     };
 
-    useEffect(() => {
-        const adminData = JSON.parse(localStorage.getItem('adminInfo'));
-        if (adminData) {
-            navigate('/admin')
-        } else {
-            navigate('/admin/signin');
-        }
-    }, [navigate]);
+    // useEffect(() => {
+    //     const adminData = JSON.parse(localStorage.getItem('adminInfo'));
+    //     if (!adminData) {
+    //         navigate('/admin/signin');
+    // }
+    // }, [navigate]);
 
 
     return (

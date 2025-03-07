@@ -1,22 +1,38 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Layout } from '../layout/Layout';
 import { UsersTable } from '../usersData/UserTable';
 import { UserFormModal } from '../usersData/UserFormModal';
 import { DeleteUserModal } from '../usersData/DeleteUserModal';
 import { useToast } from '../../hooks/useToast';
-
-
-
+import axios from 'axios';
+import { api } from '../../lib/api';
 
 export default function Users() {
-    const [users, setUsers] = useState();
+    const [users, setUsers] = useState([]);  // Initialize as an empty array
     const [userFormOpen, setUserFormOpen] = useState(false);
     const [deleteModalOpen, setDeleteModalOpen] = useState(false);
-    const [selectedUser, setSelectedUser] = useState(undefined);
+    const [selectedUser, setSelectedUser] = useState(null);
     const { toast } = useToast();
 
+    useEffect(() => {
+        fetchUsers();
+    }, []); // Add dependency array to prevent infinite re-renders
+
+    const fetchUsers = async () => {
+        try {
+            const response = await axios.get(`${api}/admin/users`, {
+                headers: { "Content-Type": "application/json" },
+                withCredentials: true,
+            });
+            setUsers(response.data);
+        } catch (error) {
+            console.error("Error fetching users:", error);
+        }
+    };
+    console.log(users)
+
     const handleNewUser = () => {
-        setSelectedUser(undefined);
+        setSelectedUser(null);
         setUserFormOpen(true);
     };
 
@@ -32,7 +48,6 @@ export default function Users() {
 
     const handleUserFormSubmit = (userData) => {
         if (selectedUser) {
-            // Edit user
             setUsers(users.map(user =>
                 user.id === selectedUser.id ? { ...user, ...userData } : user
             ));
@@ -41,12 +56,7 @@ export default function Users() {
                 description: `${userData.name} has been updated successfully.`,
             });
         } else {
-            // Create new user
-            const newUser = {
-                id: String(Date.now()),
-                ...userData,
-            };
-
+            const newUser = { id: String(Date.now()), ...userData };
             setUsers([newUser, ...users]);
             toast({
                 title: "User created",
@@ -77,7 +87,7 @@ export default function Users() {
 
             <div className="animate-fade-in">
                 <UsersTable
-                    users={users}
+                    users={users} // Pass fetched users to UsersTable
                     onNewUser={handleNewUser}
                     onEditUser={handleEditUser}
                     onDeleteUser={handleDeleteUser}
@@ -99,4 +109,4 @@ export default function Users() {
             />
         </Layout>
     );
-} 
+}
