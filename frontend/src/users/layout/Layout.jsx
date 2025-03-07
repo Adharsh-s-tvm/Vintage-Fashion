@@ -137,7 +137,7 @@ export function Layout({ children, showSidebar = false, sidebarContent }) {
           </>
         )}
         <div
-          className={`flex-1 container mx-auto px-4 py-8 transition-all duration-300 ${showSidebar ? (sidebarOpen ? 'md:ml-64' : 'md:ml-0') : ''
+          className={`flex-1 container mx-auto px-4 py-8 transition-all duration-300 ${showSidebar ? (sidebarOpen ? 'md:ml-0' : 'md:ml-0') : ''
             }`}
         >
 
