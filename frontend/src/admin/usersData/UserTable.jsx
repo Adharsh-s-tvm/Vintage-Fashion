@@ -58,7 +58,7 @@ export function UsersTable({ users: initialUsers, onNewUser, onEditUser, onDelet
             (filter === 'unverified' && !user.verified);
 
         return matchesSearch && matchesFilter;
-    });
+    }).sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));;
 
     return (
         <div className="bg-white rounded-xl border border-gray-100 shadow-elevation-2 overflow-hidden">
