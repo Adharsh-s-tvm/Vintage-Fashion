@@ -26,7 +26,7 @@ import {
 import { cn } from '../../lib/util';
 
 export function UsersTable({ users: initialUsers, onNewUser, onEditUser, onDeleteUser }) {
-    const [users, setUsers] = useState(initialUsers);
+    const [users, setUsers] = useState(initialUsers || []);
     const [searchTerm, setSearchTerm] = useState('');
     const [filter, setFilter] = useState('all');
 

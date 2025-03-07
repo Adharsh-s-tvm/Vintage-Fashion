@@ -17,6 +17,8 @@ router.post("/login", loginAdmin);
 router.post("/logout", logoutCurrentAdmin);
 router.get("/dashboard", authenticate, authorizeAdmin, getDashboard);
 
+router.get("/users", authenticate, authorizeAdmin, getAllUsers);
+
 router
   .route("/:id")
   .delete(authenticate, authorizeAdmin, deleteUserById)

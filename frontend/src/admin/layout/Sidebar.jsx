@@ -54,11 +54,11 @@ export function Sidebar({ className, mobileOpen, onMobileClose }) {
             label: 'Blog',
             path: '/admin/blog'
         },
-        {
-            icon: LogIn,
-            label: 'Sign In',
-            path: '/admin/signin'
-        },
+        // {
+        //     icon: LogIn,
+        //     label: 'Sign In',
+        //     path: '/admin/signin'
+        // },
         {
             icon: AlertCircle,
             label: '404',

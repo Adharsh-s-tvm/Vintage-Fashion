@@ -18,9 +18,6 @@ function AdminRoutes() {
       <Route path='/users' element={<Users />} />
       <Route path='/blog' element={<Blog />} />
       <Route path='/*' element={<NotFound redirectPageType={'admin'} />} />
-
-
-
       {/* <Route path='/signup' element={<AdminSignUp/>} /> */}
     </Routes>
   )

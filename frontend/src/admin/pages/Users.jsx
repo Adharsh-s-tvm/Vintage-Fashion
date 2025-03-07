@@ -5,92 +5,11 @@ import { UserFormModal } from '../usersData/UserFormModal';
 import { DeleteUserModal } from '../usersData/DeleteUserModal';
 import { useToast } from '../../hooks/useToast';
 
-// Mock data
-const mockUsers = [
-    {
-        id: '1',
-        avatar: 'https://i.pravatar.cc/150?img=1',
-        name: 'John Doe',
-        email: 'john.doe@example.com',
-        company: 'Apple Inc.',
-        role: 'Admin',
-        verified: true,
-        status: 'active',
-    },
-    {
-        id: '2',
-        avatar: 'https://i.pravatar.cc/150?img=2',
-        name: 'Jane Smith',
-        email: 'jane.smith@example.com',
-        company: 'Google LLC',
-        role: 'Editor',
-        verified: true,
-        status: 'active',
-    },
-    {
-        id: '3',
-        avatar: 'https://i.pravatar.cc/150?img=3',
-        name: 'Mike Johnson',
-        email: 'mike.johnson@example.com',
-        company: 'Microsoft Corp',
-        role: 'User',
-        verified: false,
-        status: 'banned',
-    },
-    {
-        id: '4',
-        avatar: 'https://i.pravatar.cc/150?img=4',
-        name: 'Sarah Williams',
-        email: 'sarah.williams@example.com',
-        company: 'Amazon Inc.',
-        role: 'User',
-        verified: true,
-        status: 'active',
-    },
-    {
-        id: '5',
-        avatar: 'https://i.pravatar.cc/150?img=5',
-        name: 'David Brown',
-        email: 'david.brown@example.com',
-        company: 'Tesla Motors',
-        role: 'Editor',
-        verified: true,
-        status: 'active',
-    },
-    {
-        id: '6',
-        avatar: 'https://i.pravatar.cc/150?img=6',
-        name: 'Emily Davis',
-        email: 'emily.davis@example.com',
-        company: 'Netflix Inc.',
-        role: 'User',
-        verified: false,
-        status: 'banned',
-    },
-    {
-        id: '7',
-        avatar: 'https://i.pravatar.cc/150?img=7',
-        name: 'Robert Wilson',
-        email: 'robert.wilson@example.com',
-        company: 'Facebook Inc.',
-        role: 'Admin',
-        verified: true,
-        status: 'active',
-    },
-    {
-        id: '8',
-        avatar: 'https://i.pravatar.cc/150?img=8',
-        name: 'Lisa Taylor',
-        email: 'lisa.taylor@example.com',
-        company: 'Twitter Inc.',
-        role: 'User',
-        verified: true,
-        status: 'active',
-    },
-];
+
+
 
 export default function Users() {
-    const [users, setUsers] = useState(mockUsers);
+    const [users, setUsers] = useState();
     const [userFormOpen, setUserFormOpen] = useState(false);
     const [deleteModalOpen, setDeleteModalOpen] = useState(false);
     const [selectedUser, setSelectedUser] = useState(undefined);

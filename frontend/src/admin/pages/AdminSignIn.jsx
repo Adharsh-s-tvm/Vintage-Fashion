@@ -2,19 +2,51 @@ import React, { useState } from 'react';
 import { Input } from '../../ui/Input';
 import { Button } from '../../ui/Button';
 import { Label } from '../../ui/Label';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { ArrowRight, Mail, Lock, EyeOff, Eye } from 'lucide-react';
 import { toast } from 'sonner';
+import { useDispatch } from 'react-redux';
+import { setAdminInfo } from '../../redux/slices/adminSlice';
+import { loginAdmin } from '../../redux/api/adminApi';
 
 export default function SignIn() {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [showPassword, setShowPassword] = useState(false);
+    const [isLoading, setIsLoading] = useState(false);
+    const dispatch = useDispatch();
+    const navigate = useNavigate();
 
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
-        // For demo purposes - just show a toast
-        toast.success('Successfully signed in!');
+        try {
+            setIsLoading(true);
+            const data = await loginAdmin(email, password);
+            console.log('Login Data:', data);
+
+            // Check if data contains the expected fields
+            if (data) {
+                // Store admin data in Redux
+                dispatch(setAdminInfo(data));
+
+                // Store admin data in local storage
+                localStorage.setItem('adminInfo', JSON.stringify(data));
+
+                // Also store JWT if available
+                if (data.token) {
+                    localStorage.setItem('jwt', data.token);
+                }
+
+                toast.success('Successfully signed in!');
+                navigate('/admin');
+            } else {
+                throw new Error('Login failed: No data received');
+            }
+        } catch (error) {
+            toast.error('Login failed: ' + error.response?.data?.message || error.message);
+        } finally {
+            setIsLoading(false);
+        }
     };
 
     return (
@@ -38,6 +70,7 @@ export default function SignIn() {
                                 value={email}
                                 onChange={(e) => setEmail(e.target.value)}
                                 required
+                                disabled={isLoading}
                             />
                         </div>
                     </div>
@@ -59,23 +92,26 @@ export default function SignIn() {
                                 value={password}
                                 onChange={(e) => setPassword(e.target.value)}
                                 required
+                                disabled={isLoading}
                             />
                             <button
                                 type="button"
                                 onClick={() => setShowPassword(!showPassword)}
                                 className="absolute right-3 top-3 text-gray-400 hover:text-gray-600"
+                                disabled={isLoading}
                             >
                                 {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                             </button>
                         </div>
                     </div>
 
-                    <Button type="submit" className="w-full">
-                        Sign In
-                        <ArrowRight className="ml-2 h-4 w-4" />
+                    <Button type="submit" className="w-full" disabled={isLoading}>
+                        {isLoading ? 'Signing In...' : 'Sign In'}
+                        {!isLoading && <ArrowRight className="ml-2 h-4 w-4" />}
                     </Button>
                 </form>
 
+                {/* Rest of the component remains the same */}
                 <div className="mt-8 text-center text-sm">
                     <p className="text-gray-500">
                         Don't have an account?{' '}
@@ -92,7 +128,8 @@ export default function SignIn() {
                 </div>
 
                 <div className="mt-6 grid grid-cols-2 gap-4">
-                    <Button variant="outline" className="w-full">
+                    <Button variant="outline" className="w-full" disabled={isLoading}>
+                        {/* Google SVG */}
                         <svg className="mr-2 h-4 w-4" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
                             <g clipPath="url(#clip0_17_40)">
                                 <path d="M47.532 24.5528C47.532 22.9214 47.3997 21.2811 47.1175 19.6761H24.48V28.9181H37.4434C36.9055 31.8988 35.177 34.5356 32.6461 36.2111V42.2078H40.3801C44.9217 38.0278 47.532 31.8547 47.532 24.5528Z" fill="#4285F4" />
@@ -108,7 +145,8 @@ export default function SignIn() {
                         </svg>
                         Google
                     </Button>
-                    <Button variant="outline" className="w-full">
+                    <Button variant="outline" className="w-full" disabled={isLoading}>
+                        {/* GitHub SVG */}
                         <svg className="mr-2 h-4 w-4" viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor">
                             <path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.012 8.012 0 0 0 16 8c0-4.42-3.58-8-8-8z" />
                         </svg>
@@ -118,4 +156,4 @@ export default function SignIn() {
             </div>
         </div>
     );
-} 
+}

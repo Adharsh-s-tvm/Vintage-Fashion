@@ -4,6 +4,7 @@ import { ArrowRight, Mail, Lock, User, EyeOff, Eye } from 'lucide-react';
 import { Input } from '../../ui/Input';
 import { Button } from '../../ui/Button';
 import { Link } from 'react-router';
+import { toast } from 'sonner';
 
 function AdminSignUp() {
 
