@@ -8,6 +8,8 @@ import Users from './Users'
 import NotFound from '../../ui/NotFound'
 import Blog from './Blog'
 import { AdminLayout } from '../layout/AdminLayout'
+import Brand from './Brand'
+import Category from './Category'
 
 function AdminRoutes() {
   return (
@@ -17,6 +19,8 @@ function AdminRoutes() {
         <Route index element={<Dashboard />} />
         <Route path='products' element={<Products />} />
         <Route path='users' element={<Users />} />
+        <Route path='brand' element={<Brand/>} />
+        <Route path='category' element={<Category/>} />
       </Route>
       <Route path='/*' element={<NotFound redirectPageType={'admin'} />} />
       {/* <Route path='/signup' element={<AdminSignUp/>} /> */}
