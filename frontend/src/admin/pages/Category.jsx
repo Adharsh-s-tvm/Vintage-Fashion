@@ -1,14 +1,13 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Dialog, Transition } from "@headlessui/react";
 import { Fragment } from "react";
+import axios from 'axios';
+import { toast } from 'sonner';
 
 const initialCategories = [
-  { id: 1, name: "Trending Wears", createdAt: "2/13/2025, 7:18:03 PM" },
-  { id: 2, name: "Shoes", createdAt: "2/13/2025, 7:17:47 PM" },
-  { id: 3, name: "Caps", createdAt: "2/13/2025, 7:17:40 PM" },
-  { id: 4, name: "New Category", createdAt: "2/9/2025, 9:04:59 PM" },
-  { id: 5, name: "Track Pants", createdAt: "2/4/2025, 1:03:56 PM" },
 ];
+
+const API_BASE_URL = 'http://localhost:7000/api/admin/products'; // Adjust this to match your backend URL
 
 const Category = () => {
   const [categories, setCategories] = useState(initialCategories);
@@ -36,27 +35,79 @@ const Category = () => {
     setIsAddOpen(true);
   }
 
+  // Fetch categories on component mount
+  useEffect(() => {
+    fetchCategories();
+  }, []);
+
+  const fetchCategories = async () => {
+    try {
+      const response = await axios.get(`${API_BASE_URL}/categories`);
+      setCategories(response.data);
+    } catch (error) {
+      toast.error('Failed to fetch categories');
+    }
+  };
+
   // Update Category
-  function handleUpdateCategory() {
-    setCategories(
-      categories.map((cat) =>
-        cat.id === selectedCategory.id ? { ...cat, name: updatedName } : cat
-      )
-    );
-    closeModal();
-  }
+  const handleUpdateCategory = async () => {
+    if (!selectedCategory || updatedName.trim() === "") return;
+
+    try {
+      const response = await axios.put(
+        `${API_BASE_URL}/category/${selectedCategory._id}`,
+        { name: updatedName }
+      );
+
+      setCategories(prevCategories =>
+        prevCategories.map(cat =>
+          cat._id === selectedCategory._id
+            ? { ...cat, name: response.data.name }
+            : cat
+        )
+      );
+
+      toast.success('Category updated successfully');
+      closeModal();
+    } catch (error) {
+      toast.error(error.response?.data?.message || 'Failed to update category');
+    }
+  };
 
   // Add New Category
-  function handleAddCategory() {
+  const handleAddCategory = async () => {
     if (newCategory.trim() === "") return;
-    const newCat = {
-      id: categories.length + 1,
-      name: newCategory,
-      createdAt: new Date().toLocaleString(),
-    };
-    setCategories([...categories, newCat]);
-    closeAddModal();
-  }
+
+    try {
+      const response = await axios.post(`${API_BASE_URL}/category/add`, {
+        name: newCategory
+      });
+
+      setCategories(prevCategories => [...prevCategories, response.data]);
+      toast.success('Category added successfully');
+      closeAddModal();
+    } catch (error) {
+      toast.error(error.response?.data?.message || 'Failed to add category');
+    }
+  };
+
+  // Update Category Status
+  const handleStatusChange = async (categoryId, newStatus) => {
+    try {
+      await axios.put(`${API_BASE_URL}/category/${categoryId}/status`, {
+        status: newStatus
+      });
+
+      setCategories(prevCategories =>
+        prevCategories.map(cat =>
+          cat._id === categoryId ? { ...cat, status: newStatus } : cat
+        )
+      );
+      toast.success('Category status updated successfully');
+    } catch (error) {
+      toast.error('Failed to update category status');
+    }
+  };
 
   return (
     <div className={`container mx-auto p-6 ${isOpen || isAddOpen ? "backdrop-blur-sm" : ""}`}>
@@ -82,9 +133,11 @@ const Category = () => {
           </thead>
           <tbody>
             {categories.map((category) => (
-              <tr key={category.id} className="border-b border-gray-300">
+              <tr key={category._id} className="border-b border-gray-300">
                 <td className="p-3">{category.name}</td>
-                <td className="p-3">{category.createdAt}</td>
+                <td className="p-3">
+                  {new Date(category.createdAt).toLocaleString()}
+                </td>
                 <td className="p-3 text-center">
                   <button
                     className="bg-blue-500 hover:bg-blue-700 text-white px-4 py-2 rounded"
@@ -94,8 +147,17 @@ const Category = () => {
                   </button>
                 </td>
                 <td className="p-3 text-center">
-                  <button className="bg-red-500 hover:bg-red-700 text-white px-4 py-2 rounded">
-                    Block
+                  <button
+                    className={`${category.status === 'listed'
+                      ? 'bg-red-500 hover:bg-red-700'
+                      : 'bg-green-500 hover:bg-green-700'
+                      } text-white px-4 py-2 rounded`}
+                    onClick={() => handleStatusChange(
+                      category._id,
+                      category.status === 'listed' ? 'Not listed' : 'listed'
+                    )}
+                  >
+                    {category.status === 'listed' ? 'Block' : 'Unblock'}
                   </button>
                 </td>
               </tr>
