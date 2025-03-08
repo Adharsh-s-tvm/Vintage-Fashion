@@ -1,12 +1,24 @@
 import mongoose from "mongoose";
 
-const CategorySchema = new mongoose.Schema(
+const categorySchema = new mongoose.Schema(
   {
-    name: { type: String, required: true, unique: true },
-    isDeleted: {type: Boolean, default: false},
+    name: {
+      type: String,
+      required: [true, "category name is required"],
+    },
+    status: {
+      type: String,
+      enum: ["listed", "Not listed"], 
+      default: "active" 
+    },
+    createdAt: {
+      type: Date,
+      default: Date.now,
+    },
   },
   { timestamps: true }
 );
 
-const Category = mongoose.model("Category", CategorySchema);
-module.exports = Category;
+const Category = mongoose.model("Category", categorySchema);
+
+export default Category;

@@ -7,16 +7,16 @@ const productSchema = new mongoose.Schema(
       required: [true, "Product name is required"],
     },
     category: {
-      type: String,
-      required: true,
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Category",
     },
     description: {
       type: String,
       required: [true, "Product description is required"],
     },
     brand: {
-      type: String,
-      required: [true, "Brand is required"],
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Brand",
     },
     variants: [
       {
