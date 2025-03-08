@@ -1,6 +1,7 @@
 import Product from "../models/product/productModel.js";
 import Variant from "../models/product/sizeVariantModel.js";
 import Category from "../models/product/categoryModel.js";
+import Brand from "../models/product/brandModel.js";
 
 // @desc    Add a new product
 // @route   POST /api/products/add
@@ -140,4 +141,76 @@ export const updateCategory = async (req, res) => {
   category.name = name;
   const updatedCategory = await category.save();
   res.status(200).json(updatedCategory);
+};
+
+export const addBrand = async (req, res) => {
+  const { name } = req.body;
+
+  if (!name) {
+    return res.status(400).json({ message: "Brand name is required" });
+  }
+
+  // Check if brand already exists
+  const existingBrand = await Brand.findOne({ name: { $regex: new RegExp(`^${name}$`, 'i') } });
+  if (existingBrand) {
+    return res.status(400).json({ message: "Brand already exists" });
+  }
+
+  const newBrand = new Brand({
+    name,
+    status: "listed"
+  });
+
+  const savedBrand = await newBrand.save();
+  res.status(201).json(savedBrand);
+};
+
+export const getAllBrands = async (req, res) => {
+  const brands = await Brand.find().sort({ createdAt: -1 });
+  res.status(200).json(brands);
+};
+
+export const updateBrandStatus = async (req, res) => {
+  const { id } = req.params;
+  const { status } = req.body;
+
+  if (!status || !['listed', 'Not listed'].includes(status)) {
+    return res.status(400).json({ message: "Invalid status" });
+  }
+
+  const brand = await Brand.findById(id);
+  if (!brand) {
+    return res.status(404).json({ message: "Brand not found" });
+  }
+
+  brand.status = status;
+  const updatedBrand = await brand.save();
+  res.status(200).json(updatedBrand);
+};
+
+export const updateBrand = async (req, res) => {
+  const { id } = req.params;
+  const { name } = req.body;
+
+  if (!name) {
+    return res.status(400).json({ message: "Brand name is required" });
+  }
+
+  const existingBrand = await Brand.findOne({
+    name: { $regex: new RegExp(`^${name}$`, 'i') },
+    _id: { $ne: id }
+  });
+
+  if (existingBrand) {
+    return res.status(400).json({ message: "Brand name already exists" });
+  }
+
+  const brand = await Brand.findById(id);
+  if (!brand) {
+    return res.status(404).json({ message: "Brand not found" });
+  }
+
+  brand.name = name;
+  const updatedBrand = await brand.save();
+  res.status(200).json(updatedBrand);
 };

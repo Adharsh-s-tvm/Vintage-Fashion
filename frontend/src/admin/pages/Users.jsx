@@ -61,7 +61,7 @@ export default function Users() {
         // Implement delete user functionality
         if (window.confirm(`Are you sure you want to delete ${user.firstname} ${user.lastname}?`)) {
             try {
-                await axios.delete(`${API_BASE_URL}/admin/users/${user._id}`, {
+                await axios.delete(`${api}/admin/users/${user._id}`, {
                     withCredentials: true
                 });
                 toast.success('User deleted successfully');

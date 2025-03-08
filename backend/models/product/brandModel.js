@@ -6,6 +6,11 @@ const brandSchema = new mongoose.Schema(
             type: String,
             required: [true, "brand name is required"],
         },
+        status: {
+            type: String,
+            enum: ['listed', 'Not listed'],
+            default: 'listed'
+        },
         category: {
             type: mongoose.Schema.Types.ObjectId,
             ref: "Category",
