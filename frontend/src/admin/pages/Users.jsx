@@ -31,20 +31,48 @@ export default function Users() {
     };
     console.log(users)
 
+    // const handleNewUser = () => {
+    //     setSelectedUser(null);
+    //     setUserFormOpen(true);
+    // };
+
+    // const handleEditUser = (user) => {
+    //     setSelectedUser(user);
+    //     setUserFormOpen(true);
+    // };
+
+    // const handleDeleteUser = (user) => {
+    //     setSelectedUser(user);
+    //     setDeleteModalOpen(true);
+    // };
+
+
     const handleNewUser = () => {
-        setSelectedUser(null);
-        setUserFormOpen(true);
+        // Implement new user functionality
+        console.log('Add new user');
     };
 
     const handleEditUser = (user) => {
-        setSelectedUser(user);
-        setUserFormOpen(true);
+        // Implement edit user functionality
+        console.log('Edit user:', user);
     };
 
-    const handleDeleteUser = (user) => {
-        setSelectedUser(user);
-        setDeleteModalOpen(true);
-    };
+    const handleDeleteUser = async (user) => {
+        // Implement delete user functionality
+        if (window.confirm(`Are you sure you want to delete ${user.firstname} ${user.lastname}?`)) {
+            try {
+                await axios.delete(`${API_BASE_URL}/admin/users/${user._id}`, {
+                    withCredentials: true
+                });
+                toast.success('User deleted successfully');
+                fetchUsers(); // Refresh the user list
+            } catch (err) {
+                console.error('Error deleting user:', err);
+                toast.error('Failed to delete user');
+            }
+        }
+    }
+
 
     const handleUserFormSubmit = (userData) => {
         if (selectedUser) {

@@ -96,15 +96,15 @@ export function Navbar() {
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end" className="w-56">
-                  <DropdownMenuItem onClick={() => navigate('/dashboard')}>
+                  <DropdownMenuItem onClick={() => navigate('/')}>
                     <UserCircle className="mr-2 h-4 w-4" />
                     <span>My Account</span>
                   </DropdownMenuItem>
-                  <DropdownMenuItem onClick={() => navigate('/orders')}>
+                  <DropdownMenuItem onClick={() => navigate('/')}>
                     <ShoppingBag className="mr-2 h-4 w-4" />
                     <span>My Orders</span>
                   </DropdownMenuItem>
-                  <DropdownMenuItem onClick={() => navigate('/wishlist')}>
+                  <DropdownMenuItem onClick={() => navigate('/')}>
                     <Heart className="mr-2 h-4 w-4" />
                     <span>My Wishlist</span>
                   </DropdownMenuItem>

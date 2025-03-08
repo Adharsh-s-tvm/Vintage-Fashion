@@ -24,7 +24,7 @@ const websiteVisitsData = [
 export default function Dashboard() {
     return (
         <>
-            <div className="mb-6">
+            {/* <div className="mb-6">
                 <h1 className="text-2xl md:text-3xl font-bold text-gray-900 animate-fade-in">Dashboard</h1>
                 <p className="text-gray-500 mt-1 animate-fade-in">Overview of your business performance</p>
             </div>
@@ -73,7 +73,7 @@ export default function Dashboard() {
                     title="Website Visits"
                     data={websiteVisitsData}
                 />
-            </div>
+            </div> */}
         </>
     );
 } 

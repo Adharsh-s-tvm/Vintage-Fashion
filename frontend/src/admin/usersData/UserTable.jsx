@@ -24,41 +24,78 @@ import {
     UserPlus
 } from 'lucide-react';
 import { cn } from '../../lib/util';
+import axios from 'axios';
+import { toast } from 'sonner'; // Assuming you're using sonner for toast notifications
 
-export function UsersTable({ users: initialUsers, onNewUser, onEditUser, onDeleteUser }) {
+// Define the API base URL - replace with your actual API URL
+const API_BASE_URL = 'http://localhost:7000/api'; // Adjust this to match your backend URL
+
+export function UsersTable({ users: initialUsers, onNewUser, onEditUser, onDeleteUser, onUserUpdated }) {
     const [users, setUsers] = useState(initialUsers || []);
     const [searchTerm, setSearchTerm] = useState('');
     const [filter, setFilter] = useState('all');
-
+    const [isLoading, setIsLoading] = useState(false);
 
     useEffect(() => {
         if (initialUsers) {
-            setUsers(initialUsers)
+            setUsers(initialUsers);
         }
-    })
+    }, [initialUsers]); // Add dependency to ensure effect runs when initialUsers changes
 
-    console.log("Initial Users:", initialUsers);
+    const handleStatusChange = async (userId, newStatus) => {
+        setIsLoading(true);
+        try {
+            const response = await axios.put(
+                `${API_BASE_URL}/admin/users/${userId}/status`,
+                { status: newStatus },
+                { 
+                    headers: { "Content-Type": "application/json" }, 
+                    withCredentials: true 
+                }
+            );
+            
+            // Update local state
+            setUsers((prevUsers) =>
+                prevUsers.map((user) =>
+                    user._id === userId ? { ...user, status: newStatus } : user
+                )
+            );
+            
+            // Show success message
+            toast.success(`User ${newStatus === 'active' ? 'activated' : 'banned'} successfully`);
+            
+            // Notify parent component that a user was updated (if callback exists)
+            if (onUserUpdated) {
+                onUserUpdated(userId, newStatus);
+            }
+        } catch (error) {
+            console.error("Error updating user status:", error);
+            const errorMessage = error.response?.data?.message || 
+                               "Failed to update user status. Please try again.";
+            toast.error(errorMessage);
+        } finally {
+            setIsLoading(false);
+        }
+    };
 
     // Filter users based on search term and filter
     const filteredUsers = users.filter(user => {
-        // Search filter
+        // Search filter - fixed typo in lastname
         const matchesSearch =
             user.firstname.toLowerCase().includes(searchTerm.toLowerCase()) ||
-            user.lasttname.toLowerCase().includes(searchTerm.toLowerCase()) ||
+            user.lastname.toLowerCase().includes(searchTerm.toLowerCase()) ||
             user.email.toLowerCase().includes(searchTerm.toLowerCase());
-        // user.company.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        // user.role.toLowerCase().includes(searchTerm.toLowerCase());
 
         // Status filter
         const matchesFilter =
             filter === 'all' ||
             (filter === 'active' && user.status === 'active') ||
             (filter === 'banned' && user.status === 'banned') ||
-            (filter === 'verified' && user.verified) ||
-            (filter === 'unverified' && !user.verified);
+            (filter === 'verified' && user.isVerified) ||  // Changed to match schema property name
+            (filter === 'unverified' && !user.isVerified); // Changed to match schema property name
 
         return matchesSearch && matchesFilter;
-    }).sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));;
+    }).sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
 
     return (
         <div className="bg-white rounded-xl border border-gray-100 shadow-elevation-2 overflow-hidden">
@@ -104,6 +141,7 @@ export function UsersTable({ users: initialUsers, onNewUser, onEditUser, onDelet
                     <Button
                         className="h-10 bg-blue hover:bg-blue-dark transition-colors"
                         onClick={onNewUser}
+                        disabled={isLoading}
                     >
                         <UserPlus className="h-4 w-4 mr-2" />
                         New User
@@ -115,39 +153,23 @@ export function UsersTable({ users: initialUsers, onNewUser, onEditUser, onDelet
                 <Table>
                     <TableHeader>
                         <TableRow className="bg-gray-50 hover:bg-gray-50">
-                            <TableHead className="w-12">Profile</TableHead>
-                            <TableHead className="text-center">Name</TableHead>
-                            <TableHead className="w-10" >Email</TableHead>
-                            <TableHead className="hidden md:table-cell text-center">Role</TableHead>
+                            <TableHead className="text-left">Name</TableHead>
+                            <TableHead>Email</TableHead>
                             <TableHead className="hidden md:table-cell">Verified</TableHead>
                             <TableHead className="hidden md:table-cell">Status</TableHead>
-                            <TableHead className="w-12 text-right">Actions</TableHead>
+                            <TableHead className="text-right">Actions</TableHead>
                         </TableRow>
                     </TableHeader>
                     <TableBody>
                         {filteredUsers.length > 0 ? (
                             filteredUsers.map((user) => (
-                                <TableRow key={user.id} className="hover:bg-gray-50 transition-colors">
-                                    <TableCell>
-                                        <div className="h-10 w-10 rounded-full bg-gray-200 overflow-hidden">
-                                            <img
-                                                src={user.avatar}
-                                                alt={user.name}
-                                                className="h-full w-full object-cover"
-                                            />
-                                        </div>
-                                    </TableCell>
+                                <TableRow key={user._id} className="hover:bg-gray-50 transition-colors">
                                     <TableCell>
                                         <div className="font-medium">{user.firstname} {user.lastname}</div>
                                     </TableCell>
                                     <TableCell>{user.email}</TableCell>
                                     <TableCell className="hidden md:table-cell">
-                                        <span className="px-2 py-1 rounded-full text-xs font-medium bg-gray-100">
-                                            {user.role}
-                                        </span>
-                                    </TableCell>
-                                    <TableCell className="hidden md:table-cell">
-                                        {user.verified ? (
+                                        {user.isVerified ? (
                                             <CheckCircle2 className="h-5 w-5 text-green-500" />
                                         ) : (
                                             <XCircle className="h-5 w-5 text-gray-300" />
@@ -165,7 +187,7 @@ export function UsersTable({ users: initialUsers, onNewUser, onEditUser, onDelet
                                     <TableCell className="text-right">
                                         <DropdownMenu>
                                             <DropdownMenuTrigger asChild>
-                                                <Button variant="ghost" size="icon" className="h-8 w-8">
+                                                <Button variant="ghost" size="icon" className="h-8 w-8" disabled={isLoading}>
                                                     <MoreHorizontal className="h-4 w-4" />
                                                 </Button>
                                             </DropdownMenuTrigger>
@@ -174,11 +196,17 @@ export function UsersTable({ users: initialUsers, onNewUser, onEditUser, onDelet
                                                     Edit
                                                 </DropdownMenuItem>
                                                 <DropdownMenuItem
+                                                    onClick={() => handleStatusChange(user._id, user.status === 'active' ? 'banned' : 'active')}
+                                                    className={user.status === 'active' ? "text-red-500" : "text-green-500"}
+                                                >
+                                                    {user.status === 'active' ? 'Ban User' : 'Unban User'}
+                                                </DropdownMenuItem>
+                                                {/* <DropdownMenuItem
                                                     onClick={() => onDeleteUser(user)}
                                                     className="text-red-500"
                                                 >
                                                     Delete
-                                                </DropdownMenuItem>
+                                                </DropdownMenuItem> */}
                                             </DropdownMenuContent>
                                         </DropdownMenu>
                                     </TableCell>
@@ -186,7 +214,7 @@ export function UsersTable({ users: initialUsers, onNewUser, onEditUser, onDelet
                             ))
                         ) : (
                             <TableRow>
-                                <TableCell colSpan={7} className="h-32 text-center">
+                                <TableCell colSpan={5} className="h-32 text-center">
                                     <div className="flex flex-col items-center justify-center text-gray-500">
                                         <Search className="h-8 w-8 mb-2 text-gray-300" />
                                         <p>No users found</p>
@@ -198,6 +226,6 @@ export function UsersTable({ users: initialUsers, onNewUser, onEditUser, onDelet
                     </TableBody>
                 </Table>
             </div>
-        </div >
+        </div>
     );
-} 
+}

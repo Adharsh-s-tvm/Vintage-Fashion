@@ -3,24 +3,148 @@ import { Label } from '../../ui/Label';
 import { ArrowRight, Mail, Lock, User, EyeOff, Eye } from 'lucide-react';
 import { Input } from '../../ui/Input';
 import { Button } from '../../ui/Button';
-import { Link } from 'react-router';
+import { Link, useNavigate } from 'react-router';
+import { useDispatch } from 'react-redux';
+import { toast } from 'sonner';
+import { ToastContainer } from 'react-toastify';
+import axios from 'axios';
+import { setUserInfo } from '../../redux/slices/authSlice';
 
 function UserSignUp() {
 
-    const [name, setName] = useState('');
-    const [email, setEmail] = useState('');
-    const [password, setPassword] = useState('');
+    const [formData, setFormData] = useState({
+        firstName: "",
+        lastName: "",
+        email: "",
+        password: "",
+        confirmPassword: "",
+    });
+    const [error, setError] = useState("");
+    const dispatch = useDispatch();
+    const navigate = useNavigate();
+
+
+    // const [name, setName] = useState('');
+    // const [email, setEmail] = useState('');
+    // const [password, setPassword] = useState('');
     const [showPassword, setShowPassword] = useState(false);
 
-
-    const handleSubmit = (e) => {
-        e.preventDefault();
-        // For demo purposes - just show a toast
-        toast.success('Account created successfully!');
+    const handleChange = (e) => {
+        setFormData({ ...formData, [e.target.name]: e.target.value });
     };
+
+    const validateEmail = (email) => {
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        return emailRegex.test(email);
+    };
+
+    const validatePassword = (password) => {
+        const minLength = 8;
+        const hasUpperCase = /[A-Z]/.test(password);
+        const hasLowerCase = /[a-z]/.test(password);
+        const hasNumbers = /\d/.test(password);
+        const hasSpecialChar = /[!@#$%^&*(),.?":{}|<>]/.test(password);
+
+        return (
+            password.length >= minLength &&
+            hasUpperCase &&
+            hasLowerCase &&
+            hasNumbers &&
+            hasSpecialChar
+        );
+    };
+
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+        const { firstName, lastName, email, password, confirmPassword } = formData;
+
+        if (!firstName || !lastName || !email || !password || !confirmPassword) {
+            setError("Please fill in all fields");
+            return;
+        }
+
+        if (firstName.length < 2) {
+            toast.error("First name must be at least 2 characters long", { position: "top-center" });
+            return;
+        }
+
+        if (lastName.length < 1) {
+            toast.error("Last name must be at least 1 character", { position: "top-center" });
+            return;
+        }
+
+        if (!validateEmail(email)) {
+            toast.error("Please enter a valid email address", { position: "top-center" });
+            return;
+        }
+
+        if (!validatePassword(password)) {
+            toast.error(
+                "Password must be at least 8 characters long and contain uppercase, lowercase, numbers, and special characters", { position: "top-center" }
+            );
+            return;
+        }
+
+        if (password !== confirmPassword) {
+            toast.error("Passwords do not match", { position: "top-center" });
+            return;
+        }
+
+        try {
+            const signupData = {
+                firstname: firstName.trim(),
+                lastname: lastName.trim(),
+                email: email.toLowerCase(),
+                password
+            };
+
+            console.log("Form Data being sent:", formData);
+
+
+            const response = await axios.post("http://localhost:7000/api/signup", signupData, {
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                withCredentials: true  // Add this to handle cookies
+            });
+
+            if (response.data) {
+                // Store user data in Redux and localStorage
+                const userData = {
+                    name: `${response.data.firstname} ${response.data.lastname}`,
+                    email: response.data.email,
+                };
+
+                dispatch(setUserInfo(userData));
+                localStorage.setItem('userInfo', JSON.stringify(userData));
+
+                toast.success("Signup successful!", { position: "top-center" });
+
+                // Navigate after a short delay to allow the toast to be seen
+                setTimeout(() => {
+                    navigate('/');
+                }, 1500);
+            }
+        } catch (error) {
+            console.error('Signup error details:', {
+                message: error.response?.data?.message || error.message,
+                status: error.response?.status || 'Network Error',
+                data: error.response?.data || {}
+            });
+            
+            // Use a more robust error message extraction
+            const errorMessage = error.response?.data?.message || 
+                                 error.message || 
+                                 "Connection error during signup";
+                                 
+            setError(errorMessage);
+            toast.error(errorMessage, { position: "top-center" });
+        }
+    }
 
     return (
         <div className="flex items-center justify-center min-h-[80vh]">
+            <ToastContainer/>
             <div className="bg-white p-8 rounded-xl shadow-sm border border-gray-100 w-full max-w-md animate-fade-in">
                 <div className="text-center ">
                     <h1 className="text-2xl font-bold mb-2">Create an Account</h1>
@@ -33,12 +157,13 @@ function UserSignUp() {
                         <div className="relative">
                             <User className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
                             <Input
-                                id="name"
+                                id="firstName"
+                                name="firstName"
                                 type="text"
-                                placeholder="Enter Your Name"
+                                placeholder="First Name"
                                 className="pl-10"
-                                value={name}
-                                onChange={(e) => setName(e.target.value)}
+                                value={formData.firstName}
+                                onChange={handleChange}
                                 required
                             />
                         </div>
@@ -49,12 +174,13 @@ function UserSignUp() {
                         <div className="relative">
                             <User className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
                             <Input
-                                id="name"
+                                id="lastName"
+                                name="lastName"
                                 type="text"
-                                placeholder="Enter Your Name"
+                                placeholder="Last Name"
                                 className="pl-10"
-                                value={name}
-                                onChange={(e) => setName(e.target.value)}
+                                value={formData.lastName}
+                                onChange={handleChange}
                                 required
                             />
                         </div>
@@ -66,11 +192,12 @@ function UserSignUp() {
                             <Mail className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
                             <Input
                                 id="email"
+                                name="email"
                                 type="email"
                                 placeholder="name@example.com"
                                 className="pl-10"
-                                value={email}
-                                onChange={(e) => setEmail(e.target.value)}
+                                value={formData.email}
+                                onChange={handleChange}
                                 required
                             />
                         </div>
@@ -82,11 +209,12 @@ function UserSignUp() {
                             <Lock className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
                             <Input
                                 id="password"
+                                name="password"
                                 type={showPassword ? 'text' : 'password'}
                                 placeholder="••••••••"
                                 className="pl-10"
-                                value={password}
-                                onChange={(e) => setPassword(e.target.value)}
+                                value={formData.password}
+                                onChange={handleChange}
                                 required
                             />
                             <button
@@ -107,11 +235,12 @@ function UserSignUp() {
                             <Lock className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
                             <Input
                                 id="password"
+                                name="confirmPassword"
                                 type={showPassword ? 'text' : 'password'}
                                 placeholder="••••••••"
                                 className="pl-10"
-                                value={password}
-                                onChange={(e) => setPassword(e.target.value)}
+                                value={formData.confirmPassword}
+                                onChange={handleChange}
                                 required
                             />
                             <button
