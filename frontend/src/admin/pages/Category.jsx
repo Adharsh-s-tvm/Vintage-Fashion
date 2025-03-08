@@ -13,9 +13,11 @@ const Category = () => {
   const [categories, setCategories] = useState(initialCategories);
   const [isOpen, setIsOpen] = useState(false);
   const [isAddOpen, setIsAddOpen] = useState(false);
+  const [isConfirmOpen, setIsConfirmOpen] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState(null);
   const [updatedName, setUpdatedName] = useState("");
   const [newCategory, setNewCategory] = useState("");
+  const [categoryToToggle, setCategoryToToggle] = useState(null);
 
   // Open & Close Modals
   function closeModal() {
@@ -33,6 +35,17 @@ const Category = () => {
   }
   function openAddModal() {
     setIsAddOpen(true);
+  }
+
+  // Add these new functions for handling confirmation
+  function closeConfirmModal() {
+    setIsConfirmOpen(false);
+    setCategoryToToggle(null);
+  }
+
+  function openConfirmModal(category) {
+    setCategoryToToggle(category);
+    setIsConfirmOpen(true);
   }
 
   // Fetch categories on component mount
@@ -91,7 +104,7 @@ const Category = () => {
     }
   };
 
-  // Update Category Status
+  // Modify the status change handler
   const handleStatusChange = async (categoryId, newStatus) => {
     try {
       await axios.put(`${API_BASE_URL}/category/${categoryId}/status`, {
@@ -104,6 +117,7 @@ const Category = () => {
         )
       );
       toast.success('Category status updated successfully');
+      closeConfirmModal();
     } catch (error) {
       toast.error('Failed to update category status');
     }
@@ -152,10 +166,7 @@ const Category = () => {
                       ? 'bg-red-500 hover:bg-red-700'
                       : 'bg-green-500 hover:bg-green-700'
                       } text-white px-4 py-2 rounded`}
-                    onClick={() => handleStatusChange(
-                      category._id,
-                      category.status === 'listed' ? 'Not listed' : 'listed'
-                    )}
+                    onClick={() => openConfirmModal(category)}
                   >
                     {category.status === 'listed' ? 'Block' : 'Unblock'}
                   </button>
@@ -233,6 +244,39 @@ const Category = () => {
                 onClick={handleAddCategory}
               >
                 Add Category
+              </button>
+            </div>
+          </Dialog.Panel>
+        </Dialog>
+      </Transition>
+
+      {/* Add Confirmation Modal */}
+      <Transition appear show={isConfirmOpen} as={Fragment}>
+        <Dialog as="div" className="absolute inset-0 flex items-center justify-center p-4" onClose={closeConfirmModal}>
+          <Dialog.Panel className="bg-white p-6 rounded-lg shadow-lg w-96">
+            <Dialog.Title className="text-lg font-bold text-gray-700">
+              Confirm Status Change
+            </Dialog.Title>
+            <div className="mt-3">
+              <p className="text-gray-600">
+                Are you sure you want to {categoryToToggle?.status === 'listed' ? 'block' : 'unblock'} the category "{categoryToToggle?.name}"?
+              </p>
+            </div>
+            <div className="mt-4 flex justify-end space-x-2">
+              <button
+                className="bg-gray-400 hover:bg-gray-500 text-white px-4 py-2 rounded"
+                onClick={closeConfirmModal}
+              >
+                Cancel
+              </button>
+              <button
+                className={`${categoryToToggle?.status === 'listed' ? 'bg-red-500 hover:bg-red-600' : 'bg-green-500 hover:bg-green-600'} text-white px-4 py-2 rounded`}
+                onClick={() => handleStatusChange(
+                  categoryToToggle?._id,
+                  categoryToToggle?.status === 'listed' ? 'Not listed' : 'listed'
+                )}
+              >
+                {categoryToToggle?.status === 'listed' ? 'Block' : 'Unblock'}
               </button>
             </div>
           </Dialog.Panel>
