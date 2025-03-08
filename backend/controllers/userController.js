@@ -7,6 +7,8 @@ import createToken from "../utils/createToken.js";
 const createUser = asyncHandler(async (req, res) => {
     const { firstname, lastname, email, password } = req.body;
 
+    console.log( firstname, lastname, email, password)
+
     if (!firstname || !lastname || !email || !password) {
         res.status(400);
         throw new Error("Please fill all the inputs.");
@@ -61,12 +63,17 @@ const createUser = asyncHandler(async (req, res) => {
 
 const loginUser = asyncHandler(async (req, res) => {
     const { email, password } = req.body;
-
+    
     const existingUser = await User.findOne({ email });
 
     if (!existingUser) {
         res.status(401);
         throw new Error("User not registered");
+    }
+
+    if (existingUser.status == 'banned') {
+        res.status(403);
+        throw new Error("Your account has been blocked. Contact support for assistance.");
     }
 
     const isPasswordValid = await bcrypt.compare(

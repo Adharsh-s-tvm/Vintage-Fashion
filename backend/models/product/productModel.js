@@ -1,30 +1,37 @@
-const mongoose = require("mongoose");
+import mongoose from "mongoose";
 
-const ProductSchema = new mongoose.Schema(
+const productSchema = new mongoose.Schema(
   {
-    name: { type: String, required: true },
-    description: { type: String, required: true },
+    name: {
+      type: String,
+      required: [true, "Product name is required"],
+    },
     category: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "Category",
+      type: String,
       required: true,
+    },
+    description: {
+      type: String,
+      required: [true, "Product description is required"],
     },
     brand: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "Brand",
-      required: true,
+      type: String,
+      required: [true, "Brand is required"],
     },
-    material: { type: String },
-    pattern: { type: String },
-    gender: { type: String, required: true }, // Example: 'Men', 'Women', 'Unisex'
-    sizeVariants: [{ type: mongoose.Schema.Types.ObjectId, ref: "SizeVariant" }], // Size-based variants
-    activeOffer: { type: mongoose.Schema.Types.ObjectId, ref: "Offer" },
-    discountedPrice: { type: Number },
-    isDeleted: { type: Boolean, default: false },
-    reviews: [{ type: mongoose.Schema.Types.ObjectId, ref: "Review" }], // Fixed duplicate key
+    variants: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Variant",
+      },
+    ], // Array of Variant IDs
+    createdAt: {
+      type: Date,
+      default: Date.now,
+    },
   },
   { timestamps: true }
 );
 
-const Product = mongoose.model("Product", ProductSchema);
-module.exports = Product;
+const Product = mongoose.model("Product", productSchema);
+
+export default Product;

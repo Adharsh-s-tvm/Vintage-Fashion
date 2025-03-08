@@ -11,6 +11,7 @@ import connectDB from './config/db.js'
 import userRoutes from './routes/userRoutes.js'
 import adminRoutes from "./routes/adminRoutes.js";
 import signUpOtpRoutes from './routes/signUpOtp/signUpOtpRoutes.js'
+import productRoutes from './routes/productRoutes.js'
 
 dotenv.config()
 const port = process.env.PORT || 7000;
@@ -30,6 +31,10 @@ app.use(cookieParser())
 
 app.use("/api", userRoutes);
 app.use("/api/admin", adminRoutes);
+
+
+app.use("/api/admin/products", productRoutes )
+
 
 app.use("/api/user/otp", signUpOtpRoutes);
 

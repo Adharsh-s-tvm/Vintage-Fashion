@@ -116,6 +116,49 @@ const updateUserById = asyncHandler(async (req, res) => {
 });
 
 
+// Controller function for updating user status
+export const updateUserStatus = asyncHandler(async (req, res) => {
+    const { status } = req.body; // Expecting 'active' or 'banned'
+    const userId = req.params.id;
+
+    // Validate status
+    if (!["active", "banned"].includes(status)) {
+        return res.status(400).json({ message: "Invalid status value" });
+    }
+
+    try {
+        // Find user and update status
+        const user = await User.findById(userId);
+
+        if (!user) {
+            return res.status(404).json({ message: "User not found" });
+        }
+
+        // Update user status
+        user.status = status;
+        await user.save();
+
+        // Return success response
+        res.status(200).json({ 
+            message: `User ${status === 'active' ? 'activated' : 'banned'} successfully`, 
+            user: {
+                _id: user._id,
+                firstname: user.firstname,
+                lastname: user.lastname,
+                email: user.email,
+                status: user.status,
+                isVerified: user.isVerified,
+                isAdmin: user.isAdmin
+            }
+        });
+    } catch (error) {
+        console.error("Error updating user status:", error);
+        res.status(500).json({ message: "Failed to update user status" });
+    }
+});
+
+
+
 const deleteUserById = asyncHandler(async (req, res) => {
     const user = await User.findById(req.params.id);
 

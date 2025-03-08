@@ -1,17 +1,46 @@
-const mongoose = require('mongoose');
+import mongoose from "mongoose";
 
-const SizeVariantSchema = new mongoose.Schema(
+const variantSchema = new mongoose.Schema(
   {
-    product: { type: mongoose.Schema.Types.ObjectId, ref: 'Product', required: true }, // Link to Product
-    size: { type: String, required: true },  // Example: 'S', 'M', 'L', 'XL'
-    price: { type: Number, required: true },
-    discountPrice: { type: Number },
-    inStock: { type: Boolean, default: true }, 
-    stockCount: { type: Number, required: true, default: 0 },
-    description: { type: String }, 
+    product: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Product",
+      required: true,
+    },
+    size: {
+      type: String,
+      required: [true, "Size is required"],
+    },
+    color: {
+      type : String,
+      required : true,
+    },
+    stock: {
+      type: Number,
+      required: [true, "Stock is required"],
+      min: [0, "Stock cannot be negative"],
+    },
+    price: {
+      type: Number,
+      required: [true, "Price is required"],
+      min: [0, "Price cannot be negative"],
+    },
+    mainImage: {
+      type: String, 
+      required: [true, "At least one image is required"],
+    },
+    subImages: {
+      type: [String],
+      required: true,
+    },
+    createdAt: {
+      type: Date,
+      default: Date.now,
+    },
   },
   { timestamps: true }
 );
 
-const SizeVariant = mongoose.model('SizeVariant', SizeVariantSchema);
-module.exports = SizeVariant;
+const Variant = mongoose.model("Variant", variantSchema);
+
+export default Variant;

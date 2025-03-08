@@ -7,7 +7,8 @@ import {
   deleteUserById,
   getUserById,
   updateUserById,
-  getDashboard
+  getDashboard,
+  updateUserStatus
 } from "../controllers/adminController.js";
 
 const router = express.Router();
@@ -20,9 +21,13 @@ router.get("/dashboard", authenticate, authorizeAdmin, getDashboard);
 router.get("/users", authenticate, authorizeAdmin, getAllUsers);
 
 router
-  .route("/:id")
+  .route("/users/:id")
   .delete(authenticate, authorizeAdmin, deleteUserById)
   .get(authenticate, authorizeAdmin, getUserById)
   .put(authenticate, authorizeAdmin, updateUserById);
+
+
+router.put("/users/:id/status", authenticate, authorizeAdmin, updateUserStatus);
+
 
 export default router;
