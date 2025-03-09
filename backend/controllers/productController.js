@@ -7,55 +7,91 @@ import Brand from "../models/product/brandModel.js";
 // @route   POST /api/products/add
 // @access  Admin
 export const addProduct = async (req, res) => {
-  const { name, category, description, brand } = req.body;
+  try {
+    const product = new Product(req.body);
+    await product.save();
 
-  if (!name || !category || !description || !brand) {
-    return res.status(400).json({ message: "All fields are required" });
+    // Fetch the saved product with populated fields
+    const populatedProduct = await Product.findById(product._id)
+      .populate('category', 'name')
+      .populate('brand', 'name');
+
+    res.status(201).json(populatedProduct);
+  } catch (error) {
+    console.error('Error adding product:', error);
+    res.status(400).json({ message: error.message });
   }
-
-  const newProduct = new Product({ name, category, description, brand });
-
-  const savedProduct = await newProduct.save();
-  res.status(201).json(savedProduct);
 };
 
 // @desc    Get all products
 // @route   GET /api/products
 // @access  Public
 export const getAllProducts = async (req, res) => {
-  const products = await Product.find().populate("variants");
-  res.status(200).json(products);
+  try {
+    const products = await Product.find()
+      .populate('category', 'name')
+      .populate('brand', 'name')
+      .populate('variants');
+
+    res.json(products);
+  } catch (error) {
+    console.error('Error fetching products:', error);
+    res.status(500).json({ message: 'Error fetching products' });
+  }
 };
 
 export const addVariant = async (req, res) => {
-  const { productId, size, color, stock, price, mainImage, subImages } = req.body;
+  try {
+    const { size, color, stock, price } = req.body;
+    const productId = req.body.product; // This will come from the frontend
 
-  if (!productId || !size || !color || !stock || !price || !mainImage || !subImages) {
-    return res.status(400).json({ message: "All fields are required" });
+    // Validate required fields
+    if (!productId || !size || !color || !stock || !price) {
+      return res.status(400).json({ message: "All fields are required" });
+    }
+
+    // Check if files were uploaded
+    if (!req.files || !req.files.mainImage || !req.files.subImages) {
+      return res.status(400).json({ message: "Both main image and sub images are required" });
+    }
+
+    // Get file paths
+    const mainImagePath = req.files.mainImage[0].path;
+    const subImagePaths = req.files.subImages.map(file => file.path);
+
+    // Check if product exists
+    const product = await Product.findById(productId);
+    if (!product) {
+      return res.status(404).json({ message: "Product not found" });
+    }
+
+    // Create new variant
+    const newVariant = new Variant({
+      product: productId,
+      size,
+      color,
+      stock: Number(stock),
+      price: Number(price),
+      mainImage: mainImagePath,
+      subImages: subImagePaths,
+    });
+
+    // Save variant
+    const savedVariant = await newVariant.save();
+
+    // Add variant to product's variants array
+    product.variants.push(savedVariant._id);
+    await product.save();
+
+    // Populate the variant with product details
+    const populatedVariant = await Variant.findById(savedVariant._id)
+      .populate('product', 'name');
+
+    res.status(201).json(populatedVariant);
+  } catch (error) {
+    console.error('Error adding variant:', error);
+    res.status(400).json({ message: error.message });
   }
-
-  const product = await Product.findById(productId);
-  if (!product) {
-    return res.status(404).json({ message: "Product not found" });
-  }
-
-  const newVariant = new Variant({
-    product: productId,
-    size,
-    color,
-    stock,
-    price,
-    mainImage,
-    subImages,
-  });
-
-  const savedVariant = await newVariant.save();
-
-  // Add variant to product's variant list
-  product.variants.push(savedVariant._id);
-  await product.save();
-
-  res.status(201).json(savedVariant);
 };
 
 // @desc    Add a new category
@@ -213,4 +249,69 @@ export const updateBrand = async (req, res) => {
   brand.name = name;
   const updatedBrand = await brand.save();
   res.status(200).json(updatedBrand);
+};
+
+// Add a controller to get variants for a specific product
+export const getProductVariants = async (req, res) => {
+  try {
+    const { productId } = req.params;
+
+    const variants = await Variant.find({ product: productId })
+      .populate('product', 'name');
+
+    res.status(200).json(variants);
+  } catch (error) {
+    console.error('Error fetching variants:', error);
+    res.status(500).json({ message: 'Error fetching variants' });
+  }
+};
+
+// Add a controller to update product
+export const updateProduct = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const updateData = req.body;
+
+    const updatedProduct = await Product.findByIdAndUpdate(
+      id,
+      updateData,
+      { new: true }
+    ).populate('category', 'name')
+      .populate('brand', 'name');
+
+    if (!updatedProduct) {
+      return res.status(404).json({ message: "Product not found" });
+    }
+
+    res.status(200).json(updatedProduct);
+  } catch (error) {
+    console.error('Error updating product:', error);
+    res.status(400).json({ message: error.message });
+  }
+};
+
+// Add a controller to delete variant
+export const deleteVariant = async (req, res) => {
+  try {
+    const { variantId } = req.params;
+
+    const variant = await Variant.findById(variantId);
+    if (!variant) {
+      return res.status(404).json({ message: "Variant not found" });
+    }
+
+    // Remove variant from product's variants array
+    await Product.findByIdAndUpdate(
+      variant.product,
+      { $pull: { variants: variantId } }
+    );
+
+    // Delete variant
+    await Variant.findByIdAndDelete(variantId);
+
+    res.status(200).json({ message: "Variant deleted successfully" });
+  } catch (error) {
+    console.error('Error deleting variant:', error);
+    res.status(500).json({ message: 'Error deleting variant' });
+  }
 };

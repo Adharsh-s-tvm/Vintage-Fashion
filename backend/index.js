@@ -33,7 +33,7 @@ app.use("/api", userRoutes);
 app.use("/api/admin", adminRoutes);
 
 
-app.use("/api/admin/products", productRoutes )
+app.use("/api/admin/products", productRoutes)
 
 
 app.use("/api/user/otp", signUpOtpRoutes);
