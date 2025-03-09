@@ -108,7 +108,7 @@ export function FeaturedProducts() {
         </div>
         <div className="text-center mt-12">
           <Button asChild className="px-8">
-            <Link to="#">View All Products</Link>
+            <Link to="/products">View All Products</Link>
           </Button>
         </div>
       </div>

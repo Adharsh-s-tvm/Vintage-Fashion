@@ -20,10 +20,10 @@ export default function ECommerce() {
           </Button>
         </Link>
       </div>
-      <Categories />
+      {/* <Categories /> */}
       <FeaturedProducts />
-      <Testimonials />
-      <Newsletter />
+      {/* <Testimonials /> */}
+      {/* <Newsletter /> */}
     </Layout>
   );
 }
