@@ -9,6 +9,7 @@ import { toast } from 'sonner';
 import { ToastContainer } from 'react-toastify';
 import axios from 'axios';
 import { setUserInfo } from '../../redux/slices/authSlice';
+import { api } from '../../lib/api';
 
 function UserSignUp() {
 
@@ -28,6 +29,13 @@ function UserSignUp() {
     // const [email, setEmail] = useState('');
     // const [password, setPassword] = useState('');
     const [showPassword, setShowPassword] = useState(false);
+
+
+    const [otp, setOtp] = useState("");
+    const [otpSent, setOtpSent] = useState(false);
+    const [message, setMessage] = useState("");
+    const [timer, setTimer] = useState(60);
+    const [email, setEmail] = useState(formData.email)
 
     const handleChange = (e) => {
         setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -131,20 +139,55 @@ function UserSignUp() {
                 status: error.response?.status || 'Network Error',
                 data: error.response?.data || {}
             });
-            
+
             // Use a more robust error message extraction
-            const errorMessage = error.response?.data?.message || 
-                                 error.message || 
-                                 "Connection error during signup";
-                                 
+            const errorMessage = error.response?.data?.message ||
+                error.message ||
+                "Connection error during signup";
+
             setError(errorMessage);
             toast.error(errorMessage, { position: "top-center" });
         }
     }
 
+
+    const sendOtp = async () => {
+        try {
+            const { data } = await axios.post(`${api}/user/otp/send`, { email });
+            setOtpSent(true);
+            setMessage(data.message);
+            startTimer();
+        } catch (error) {
+            setMessage(error.response?.data?.message || "Error sending OTP");
+        }
+    };
+
+
+    const verifyOtp = async () => {
+        try {
+            const { data } = await axios.post(`${api}/user/otp/verify`, { email, otp });
+            setMessage(data.message);
+        } catch (error) {
+            setMessage(error.response?.data?.message || "Error verifying OTP");
+        }
+    };
+
+
+
+    const startTimer = () => {
+        setTimer(60);
+        const interval = setInterval(() => {
+            setTimer((prev) => {
+                if (prev === 1) clearInterval(interval);
+                return prev - 1;
+            });
+        }, 1000);
+    };
+
+
     return (
         <div className="flex items-center justify-center min-h-[80vh]">
-            <ToastContainer/>
+            <ToastContainer />
             <div className="bg-white p-8 rounded-xl shadow-sm border border-gray-100 w-full max-w-md animate-fade-in">
                 <div className="text-center ">
                     <h1 className="text-2xl font-bold mb-2">Create an Account</h1>

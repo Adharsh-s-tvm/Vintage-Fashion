@@ -10,7 +10,7 @@ import cors from 'cors'
 import connectDB from './config/db.js'
 import userRoutes from './routes/userRoutes.js'
 import adminRoutes from "./routes/adminRoutes.js";
-import signUpOtpRoutes from './routes/signUpOtp/signUpOtpRoutes.js'
+import signUpOtpRoutes from './routes/signUpOtpRoutes.js'
 import productRoutes from './routes/productRoutes.js'
 
 dotenv.config()
