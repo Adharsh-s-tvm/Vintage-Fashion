@@ -19,13 +19,11 @@ export function HeroSection() {
               <div className="mt-5 sm:mt-8 sm:flex">
                 <div className="rounded-md shadow">
                   <Button className="w-full md:w-auto text-lg">
-                    <Link to="#">Shop Now</Link>
+                    <Link to="/products">Shop Now</Link>
                   </Button>
                 </div>
                 <div className="mt-3 sm:mt-0 sm:ml-3">
-                  <Button variant="outline" className="w-full md:w-auto text-lg">
-                    <Link to="#">Explore Collection</Link>
-                  </Button>
+                 
                 </div>
               </div>
               <div className="mt-6 bg-white/30 backdrop-blur-md rounded-lg p-4 inline-block">

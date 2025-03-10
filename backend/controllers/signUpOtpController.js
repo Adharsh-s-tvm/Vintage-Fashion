@@ -124,3 +124,45 @@ export const verifyOTP = async (req, res) => {
   }
 };
 
+
+
+export const resSendOTP = asyncHandler(async (req, res) => {
+  const { email } = req.body;
+
+  if (!email) {
+    return res.status(400).json({ message: "Email is required" });
+  }
+
+  // Generate a random 6-digit OTP as a string
+  const otpCode = `${Math.floor(100000 + Math.random() * 900000)}`;
+
+  // Set OTP expiration time (e.g., 5 minutes)
+  const otpExpiry = new Date(Date.now() + 5 * 60 * 1000); // Add 5 minutes
+
+
+  try {
+    // Save or update OTP in MongoDB
+    const otpData = await OTP.findOneAndUpdate(
+      { email }, 
+      { otp: otpCode, expiresAt: otpExpiry }, 
+      { upsert: true, new: true, setDefaultsOnInsert: true }
+    );
+
+    console.log(`✅ OTP stored in DB for ${email}:`, otpData);
+
+    // Confirm OTP has been saved
+    const savedOTP = await OTP.findOne({ email });
+    if (!savedOTP) {
+      console.log("❌ OTP NOT SAVED in MongoDB.");
+      return res.status(500).json({ message: "Failed to save OTP. Please try again." });
+    }
+
+    // Send OTP via email
+    await sendEmailOTP(email, otpCode);  // Ensure this function is working correctly
+
+    res.status(200).json({ message: "OTP sent successfully", otpCode });
+  } catch (error) {
+    console.error("❌ Error saving OTP:", error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+});
