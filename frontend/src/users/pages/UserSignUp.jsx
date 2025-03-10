@@ -31,7 +31,11 @@ function UserSignUp() {
     const [showPassword, setShowPassword] = useState(false);
 
 
+    const [showOtpModal, setShowOtpModal] = useState(false);
     const [otp, setOtp] = useState("");
+    const [otpError, setOtpError] = useState("");
+    const [isOtpVerified, setIsOtpVerified] = useState(false);
+
     const [otpSent, setOtpSent] = useState(false);
     const [message, setMessage] = useState("");
     const [timer, setTimer] = useState(60);
@@ -99,57 +103,66 @@ function UserSignUp() {
         }
 
         try {
-            const signupData = {
-                firstname: firstName.trim(),
-                lastname: lastName.trim(),
-                email: email.toLowerCase(),
-                password
-            };
-
-            console.log("Form Data being sent:", formData);
-
-
-            const response = await axios.post("http://localhost:7000/api/signup", signupData, {
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                withCredentials: true  // Add this to handle cookies
+            // First send OTP
+            const otpResponse = await axios.post("http://localhost:7000/api/user/otp/send", {
+                email: email.toLowerCase()
             });
 
-            if (response.data) {
-                // Store user data in Redux and localStorage
-                const userData = {
-                    name: `${response.data.firstname} ${response.data.lastname}`,
-                    email: response.data.email,
-                };
-
-                dispatch(setUserInfo(userData));
-                localStorage.setItem('userInfo', JSON.stringify(userData));
-
-                toast.success("Signup successful!", { position: "top-center" });
-
-                // Navigate after a short delay to allow the toast to be seen
-                setTimeout(() => {
-                    navigate('/');
-                }, 1500);
+            if (otpResponse.data) {
+                toast.success("OTP sent to your email!", { position: "top-center" });
+                setShowOtpModal(true);
             }
         } catch (error) {
-            console.error('Signup error details:', {
-                message: error.response?.data?.message || error.message,
-                status: error.response?.status || 'Network Error',
-                data: error.response?.data || {}
-            });
-
-            // Use a more robust error message extraction
-            const errorMessage = error.response?.data?.message ||
-                error.message ||
-                "Connection error during signup";
-
-            setError(errorMessage);
+            const errorMessage = error.response?.data?.message || "Error sending OTP";
             toast.error(errorMessage, { position: "top-center" });
         }
-    }
+    };
 
+    const verifyOtpAndSignup = async () => {
+        try {
+            // First verify OTP
+            const verifyResponse = await axios.post("http://localhost:7000/api/user/otp/verify", {
+                email: formData.email.toLowerCase(),
+                otp
+            });
+
+            if (verifyResponse.data.success) {
+                // If OTP is verified, proceed with signup
+                const signupData = {
+                    firstname: formData.firstName.trim(),
+                    lastname: formData.lastName.trim(),
+                    email: formData.email.toLowerCase(),
+                    password: formData.password
+                };
+
+                const response = await axios.post("http://localhost:7000/api/", signupData, {
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    withCredentials: true
+                });
+
+                if (response.data) {
+                    const userData = {
+                        name: `${response.data.firstname} ${response.data.lastname}`,
+                        email: response.data.email,
+                    };
+
+                    dispatch(setUserInfo(userData));
+                    localStorage.setItem('userInfo', JSON.stringify(userData));
+                    toast.success("Signup successful!", { position: "top-center" });
+
+                    setTimeout(() => {
+                        navigate('/');
+                    }, 1500);
+                }
+            }
+        } catch (error) {
+            const errorMessage = error.response?.data?.message || "Invalid OTP";
+            setOtpError(errorMessage);
+            toast.error(errorMessage, { position: "top-center" });
+        }
+    };
 
     const sendOtp = async () => {
         try {
@@ -162,7 +175,6 @@ function UserSignUp() {
         }
     };
 
-
     const verifyOtp = async () => {
         try {
             const { data } = await axios.post(`${api}/user/otp/verify`, { email, otp });
@@ -171,8 +183,6 @@ function UserSignUp() {
             setMessage(error.response?.data?.message || "Error verifying OTP");
         }
     };
-
-
 
     const startTimer = () => {
         setTimer(60);
@@ -184,6 +194,40 @@ function UserSignUp() {
         }, 1000);
     };
 
+    const OtpModal = () => {
+        if (!showOtpModal) return null;
+
+        return (
+            <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
+                <div className="bg-white p-8 rounded-xl shadow-lg w-96">
+                    <h2 className="text-xl font-bold mb-4">Enter OTP</h2>
+                    <p className="text-sm text-gray-600 mb-4">
+                        Please enter the OTP sent to your email
+                    </p>
+                    <Input
+                        type="text"
+                        placeholder="Enter OTP"
+                        value={otp}
+                        onChange={(e) => setOtp(e.target.value)}
+                        className="mb-4"
+                    />
+                    {otpError && <p className="text-red-500 text-sm mb-4">{otpError}</p>}
+                    <div className="flex gap-4">
+                        <Button onClick={verifyOtpAndSignup} className="flex-1">
+                            Verify OTP
+                        </Button>
+                        <Button
+                            variant="outline"
+                            onClick={() => setShowOtpModal(false)}
+                            className="flex-1"
+                        >
+                            Cancel
+                        </Button>
+                    </div>
+                </div>
+            </div>
+        );
+    };
 
     return (
         <div className="flex items-center justify-center min-h-[80vh]">
@@ -345,6 +389,7 @@ function UserSignUp() {
                     </Button>
                 </div>
             </div>
+            <OtpModal />
         </div>
     )
 }
