@@ -189,13 +189,18 @@ const Products = () => {
       formData.append('color', variantData.color);
       formData.append('stock', variantData.stock);
       formData.append('price', variantData.price);
-      formData.append('mainImage', variantData.mainImage);
+
+      if(variantData.mainImage){
+        formData.append('mainImage', variantData.mainImage);
+      }
 
       Object.values(variantData.subImages).forEach(image => {
-        formData.append('subImages', image);
+        if (image) {
+          formData.append('subImages', image);
+        }
       });
 
-      await axios.post(`${API_BASE_URL}/products/variant/add`, formData, {
+      const response = await axios.post(`${API_BASE_URL}/products/variant/add`, formData, {
         headers: {
           'Content-Type': 'multipart/form-data'
         }
@@ -219,6 +224,8 @@ const Products = () => {
       });
       fetchProducts();
     } catch (error) {
+      console.log(error);
+      
       toast.error(error.response?.data?.message || 'Failed to add variant');
     }
   };

@@ -4,33 +4,11 @@ import path from 'path';
 
 import { addProduct, getAllProducts, addVariant, addCategory, getAllCategories, updateCategoryStatus, updateCategory, addBrand, getAllBrands, updateBrandStatus, updateBrand, getProductVariants, deleteVariant, updateProduct } from "../controllers/productController.js";
 import asyncHandler from "../middlewares/asyncHandler.js";
+import upload from "../middlewares/multer.js";
 
 const router = express.Router();
 
-const storage = multer.diskStorage({
-    destination: function (req, file, cb) {
-        cb(null, 'uploads/');
-    },
-    filename: function (req, file, cb) {
-        cb(null, `${Date.now()}-${Math.round(Math.random() * 1E9)}${path.extname(file.originalname)}`);
-    }
-});
 
-const fileFilter = (req, file, cb) => {
-    if (file.mimetype.startsWith('image/')) {
-        cb(null, true);
-    } else {
-        cb(new Error('Not an image! Please upload only images.'), false);
-    }
-};
-
-const upload = multer({
-    storage: storage,
-    fileFilter: fileFilter,
-    limits: {
-        fileSize: 5 * 1024 * 1024 // 5MB limit
-    }
-});
 
 // Admin: Add Product
 router.post("/add", asyncHandler(addProduct));

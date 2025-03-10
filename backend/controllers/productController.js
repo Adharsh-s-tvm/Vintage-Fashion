@@ -42,11 +42,10 @@ export const getAllProducts = async (req, res) => {
 
 export const addVariant = async (req, res) => {
   try {
-    const { size, color, stock, price } = req.body;
-    const productId = req.body.product; // This will come from the frontend
+    const { size, color, stock, price, product } = req.body;
 
     // Validate required fields
-    if (!productId || !size || !color || !stock || !price) {
+    if (!product || !size || !color || !stock || !price) {
       return res.status(400).json({ message: "All fields are required" });
     }
 
@@ -55,33 +54,33 @@ export const addVariant = async (req, res) => {
       return res.status(400).json({ message: "Both main image and sub images are required" });
     }
 
-    // Get file paths
-    const mainImagePath = req.files.mainImage[0].path;
-    const subImagePaths = req.files.subImages.map(file => file.path);
+    // Get image URLs from Cloudinary uploads
+    const mainImageUrl = req.files.mainImage[0].path;
+    const subImageUrls = req.files.subImages.map(file => file.path);
 
     // Check if product exists
-    const product = await Product.findById(productId);
-    if (!product) {
+    const productExists = await Product.findById(product);
+    if (!productExists) {
       return res.status(404).json({ message: "Product not found" });
     }
 
     // Create new variant
     const newVariant = new Variant({
-      product: productId,
+      product,
       size,
       color,
       stock: Number(stock),
       price: Number(price),
-      mainImage: mainImagePath,
-      subImages: subImagePaths,
+      mainImage: mainImageUrl,
+      subImages: subImageUrls,
     });
 
     // Save variant
     const savedVariant = await newVariant.save();
 
     // Add variant to product's variants array
-    product.variants.push(savedVariant._id);
-    await product.save();
+    productExists.variants.push(savedVariant._id);
+    await productExists.save();
 
     // Populate the variant with product details
     const populatedVariant = await Variant.findById(savedVariant._id)
