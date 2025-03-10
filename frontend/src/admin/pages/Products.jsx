@@ -183,7 +183,26 @@ const Products = () => {
 
   const handleVariantSubmit = async () => {
     try {
+      // Validate form data
+      if (!variantData.size || !variantData.color || !variantData.stock || !variantData.price) {
+        toast.error('Please fill in all fields');
+        return;
+      }
+
+      // Validate images
+      if (!variantData.mainImage) {
+        toast.error('Main image is required');
+        return;
+      }
+
+      if (Object.keys(variantData.subImages).length === 0) {
+        toast.error('At least one sub image is required');
+        return;
+      }
+
       const formData = new FormData();
+
+      // Append basic data
       formData.append('product', selectedProduct._id);
       formData.append('size', variantData.size);
       formData.append('color', variantData.color);
@@ -191,50 +210,56 @@ const Products = () => {
       formData.append('price', variantData.price);
 
       // Append main image
-      if (variantData.mainImage) {
-        formData.append('mainImage', variantData.mainImage);
-      }
+      formData.append('mainImage', variantData.mainImage);
 
       // Append sub images
-      Object.values(variantData.subImages).forEach(image => {
-        if (image) {
-          formData.append('subImages', image);
-        }
+      Object.values(variantData.subImages).forEach(file => {
+        formData.append('subImages', file);
       });
 
-      const response = await axios.post(`${API_BASE_URL}/products/variant/add`, formData, {
-        headers: {
-          'Content-Type': 'multipart/form-data'
+      // Log FormData contents for debugging
+      console.log('Submitting FormData:');
+      for (let [key, value] of formData.entries()) {
+        console.log(key, value instanceof File ? `File: ${value.name}` : value);
+      }
+
+      const response = await axios.post(
+        `${API_BASE_URL}/products/variant/add`,
+        formData,
+        {
+          headers: {
+            'Content-Type': 'multipart/form-data',
+          }
         }
-      });
+      );
 
       if (response.data.success) {
-        console.log("SUccess");
-
-        toast.success(response.data.message);
+        toast.success('Variant added successfully');
         setShowVariantModal(false);
-        setVariantData({
-          size: '',
-          color: '',
-          stock: '',
-          price: '',
-          mainImage: null,
-          subImages: {}
-        });
-        setImagePreview({
-          main: null,
-          sub1: null,
-          sub2: null,
-          sub3: null
-        });
-        fetchProducts(); // Refresh the products list
-      } else {
-        throw new Error(response.data.message);
+        resetVariantForm();
+        fetchProducts();
       }
     } catch (error) {
       console.error('Error adding variant:', error);
       toast.error(error.response?.data?.message || 'Failed to add variant');
     }
+  };
+
+  const resetVariantForm = () => {
+    setVariantData({
+      size: '',
+      color: '',
+      stock: '',
+      price: '',
+      mainImage: null,
+      subImages: {}
+    });
+    setImagePreview({
+      main: null,
+      sub1: null,
+      sub2: null,
+      sub3: null
+    });
   };
 
   const handleEditProduct = async () => {

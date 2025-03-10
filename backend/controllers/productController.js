@@ -41,46 +41,37 @@ export const getAllProducts = async (req, res) => {
 };
 
 export const addVariant = async (req, res) => {
-  console.log("running here")
   try {
     const { size, color, stock, price, product } = req.body;
 
     // Validate required fields
     if (!product || !size || !color || !stock || !price) {
-      return res.status(400).json({ message: "All fields are required" });
+      return res.status(400).json({
+        success: false,
+        message: "All fields are required"
+      });
     }
 
-    // Check if files were uploaded
+    // Debug log the received files
+    console.log('Received files:', req.files);
+
+    // Validate files
     if (!req.files || !req.files.mainImage || !req.files.subImages) {
-      return res.status(400).json({ message: "Both main image and sub images are required" });
+      return res.status(400).json({
+        success: false,
+        message: "Both main image and sub images are required"
+      });
     }
 
-    // Get image URLs from Cloudinary uploads
-    const mainImageUrl = req.files.mainImage[0].secure_url;
-    const subImageUrls = req.files.subImages.map(file => file.secure_url);
+    // Get image URLs
+    const mainImageUrl = req.files.mainImage[0].path || req.files.mainImage[0].secure_url;
+    const subImageUrls = req.files.subImages.map(file => file.path || file.secure_url);
 
-    // Log the data before saving (for debugging)
-    console.log('Saving variant with data:', {
+    // Create new variant
+    const newVariant = new Variant({
       product,
       size,
       color,
-      stock,
-      price,
-      mainImage: mainImageUrl,
-      subImages: subImageUrls
-    });
-
-    // Check if product exists
-    const productExists = await Product.findById(product);
-    if (!productExists) {
-      return res.status(404).json({ message: "Product not found" });
-    }
-
-    // Create new variant with explicit data
-    const newVariant = new Variant({
-      product: product,
-      size: size,
-      color: color,
       stock: Number(stock),
       price: Number(price),
       mainImage: mainImageUrl,
@@ -89,21 +80,17 @@ export const addVariant = async (req, res) => {
 
     // Save variant
     const savedVariant = await newVariant.save();
-    if (!savedVariant) {
-      throw new Error('Failed to save variant');
-    }
 
-    // Add variant to product's variants array
-    productExists.variants = productExists.variants || []; // Ensure variants array exists
-    productExists.variants.push(savedVariant._id);
-    await productExists.save();
+    // Update product's variants array
+    await Product.findByIdAndUpdate(
+      product,
+      { $push: { variants: savedVariant._id } }
+    );
 
-    // Populate the variant with product details
-
+    // Populate and return response
     const populatedVariant = await Variant.findById(savedVariant._id)
       .populate('product', 'name');
 
-    // Send success response with the saved data
     res.status(201).json({
       success: true,
       message: 'Variant added successfully',
@@ -111,7 +98,7 @@ export const addVariant = async (req, res) => {
     });
 
   } catch (error) {
-    console.error('Error adding variant:', error);
+    console.error('Error in addVariant:', error);
     res.status(400).json({
       success: false,
       message: error.message || 'Failed to add variant'

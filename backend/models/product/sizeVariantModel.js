@@ -25,11 +25,11 @@ const variantSchema = new mongoose.Schema(
     },
     mainImage: {
       type: String,
-      required: true,
+      required: false,
     },
     subImages: [{
       type: String,
-      required: true,
+      required: false,
     }],
     createdAt: {
       type: Date,
