@@ -9,30 +9,28 @@ const variantSchema = new mongoose.Schema(
     },
     size: {
       type: String,
-      required: [true, "Size is required"],
+      required: true,
     },
     color: {
-      type : String,
-      required : true,
+      type: String,
+      required: true,
     },
     stock: {
       type: Number,
-      required: [true, "Stock is required"],
-      min: [0, "Stock cannot be negative"],
+      required: true,
     },
     price: {
       type: Number,
-      required: [true, "Price is required"],
-      min: [0, "Price cannot be negative"],
-    },
-    mainImage: {
-      type: String, 
-      required: [true, "At least one image is required"],
-    },
-    subImages: {
-      type: [String],
       required: true,
     },
+    mainImage: {
+      type: String,
+      required: true,
+    },
+    subImages: [{
+      type: String,
+      required: true,
+    }],
     createdAt: {
       type: Date,
       default: Date.now,

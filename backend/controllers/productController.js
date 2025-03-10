@@ -41,6 +41,7 @@ export const getAllProducts = async (req, res) => {
 };
 
 export const addVariant = async (req, res) => {
+  console.log("running here")
   try {
     const { size, color, stock, price, product } = req.body;
 
@@ -55,8 +56,19 @@ export const addVariant = async (req, res) => {
     }
 
     // Get image URLs from Cloudinary uploads
-    const mainImageUrl = req.files.mainImage[0].path;
-    const subImageUrls = req.files.subImages.map(file => file.path);
+    const mainImageUrl = req.files.mainImage[0].secure_url;
+    const subImageUrls = req.files.subImages.map(file => file.secure_url);
+
+    // Log the data before saving (for debugging)
+    console.log('Saving variant with data:', {
+      product,
+      size,
+      color,
+      stock,
+      price,
+      mainImage: mainImageUrl,
+      subImages: subImageUrls
+    });
 
     // Check if product exists
     const productExists = await Product.findById(product);
@@ -64,32 +76,46 @@ export const addVariant = async (req, res) => {
       return res.status(404).json({ message: "Product not found" });
     }
 
-    // Create new variant
+    // Create new variant with explicit data
     const newVariant = new Variant({
-      product,
-      size,
-      color,
+      product: product,
+      size: size,
+      color: color,
       stock: Number(stock),
       price: Number(price),
       mainImage: mainImageUrl,
-      subImages: subImageUrls,
+      subImages: subImageUrls
     });
 
     // Save variant
     const savedVariant = await newVariant.save();
+    if (!savedVariant) {
+      throw new Error('Failed to save variant');
+    }
 
     // Add variant to product's variants array
+    productExists.variants = productExists.variants || []; // Ensure variants array exists
     productExists.variants.push(savedVariant._id);
     await productExists.save();
 
     // Populate the variant with product details
+
     const populatedVariant = await Variant.findById(savedVariant._id)
       .populate('product', 'name');
 
-    res.status(201).json(populatedVariant);
+    // Send success response with the saved data
+    res.status(201).json({
+      success: true,
+      message: 'Variant added successfully',
+      variant: populatedVariant
+    });
+
   } catch (error) {
     console.error('Error adding variant:', error);
-    res.status(400).json({ message: error.message });
+    res.status(400).json({
+      success: false,
+      message: error.message || 'Failed to add variant'
+    });
   }
 };
 

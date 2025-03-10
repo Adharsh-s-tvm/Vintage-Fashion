@@ -190,10 +190,12 @@ const Products = () => {
       formData.append('stock', variantData.stock);
       formData.append('price', variantData.price);
 
-      if(variantData.mainImage){
+      // Append main image
+      if (variantData.mainImage) {
         formData.append('mainImage', variantData.mainImage);
       }
 
+      // Append sub images
       Object.values(variantData.subImages).forEach(image => {
         if (image) {
           formData.append('subImages', image);
@@ -206,26 +208,31 @@ const Products = () => {
         }
       });
 
-      toast.success('Variant added successfully');
-      setShowVariantModal(false);
-      setVariantData({
-        size: '',
-        color: '',
-        stock: '',
-        price: '',
-        mainImage: null,
-        subImages: {}
-      });
-      setImagePreview({
-        main: null,
-        sub1: null,
-        sub2: null,
-        sub3: null
-      });
-      fetchProducts();
+      if (response.data.success) {
+        console.log("SUccess");
+
+        toast.success(response.data.message);
+        setShowVariantModal(false);
+        setVariantData({
+          size: '',
+          color: '',
+          stock: '',
+          price: '',
+          mainImage: null,
+          subImages: {}
+        });
+        setImagePreview({
+          main: null,
+          sub1: null,
+          sub2: null,
+          sub3: null
+        });
+        fetchProducts(); // Refresh the products list
+      } else {
+        throw new Error(response.data.message);
+      }
     } catch (error) {
-      console.log(error);
-      
+      console.error('Error adding variant:', error);
       toast.error(error.response?.data?.message || 'Failed to add variant');
     }
   };

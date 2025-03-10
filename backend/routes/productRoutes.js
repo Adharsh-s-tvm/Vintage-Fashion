@@ -1,10 +1,8 @@
 import express from "express";
-import multer from 'multer';
-import path from 'path';
 
 import { addProduct, getAllProducts, addVariant, addCategory, getAllCategories, updateCategoryStatus, updateCategory, addBrand, getAllBrands, updateBrandStatus, updateBrand, getProductVariants, deleteVariant, updateProduct } from "../controllers/productController.js";
 import asyncHandler from "../middlewares/asyncHandler.js";
-import upload from "../middlewares/multer.js";
+import  { handleUpload } from "../middlewares/multer.js";
 
 const router = express.Router();
 
@@ -17,10 +15,8 @@ router.post("/add", asyncHandler(addProduct));
 router.get("/", asyncHandler(getAllProducts));
 
 router.post("/variant/add",
-    upload.fields([
-        { name: 'mainImage', maxCount: 1 },
-        { name: 'subImages', maxCount: 5 }
-    ]),
+    
+    handleUpload,
     asyncHandler(addVariant)
 );
 
