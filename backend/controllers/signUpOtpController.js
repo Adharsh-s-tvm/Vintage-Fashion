@@ -86,7 +86,9 @@ export const sendOTP = asyncHandler(async (req, res) => {
 export const verifyOTP = async (req, res) => {
   try {
     const { email, otp } = req.body;
-    if (!email || !otp) return res.status(400).json({ message: "Email and OTP are required" });
+    console.log(req.body);
+    
+    if ( !otp) return res.status(400).json({ message: "OTP is required" });
 
     console.log(`🔍 Verifying OTP for ${email}: Received OTP - ${otp}`);
 
@@ -115,7 +117,7 @@ export const verifyOTP = async (req, res) => {
     // OTP is valid - delete from DB
     await OTP.deleteOne({ email });
 
-    res.status(200).json({ message: "OTP verified successfully" });
+    res.status(200).json({ message: "OTP verified successfully", success : true });
   } catch (error) {
     console.error("❌ Error in verifyOTP:", error);
     res.status(500).json({ message: "Error verifying OTP", error: error.message });

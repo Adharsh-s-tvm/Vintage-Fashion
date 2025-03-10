@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useCallback, useState } from 'react'
 import { Label } from '../../ui/Label';
 import { ArrowRight, Mail, Lock, User, EyeOff, Eye } from 'lucide-react';
 import { Input } from '../../ui/Input';
@@ -10,6 +10,7 @@ import { ToastContainer } from 'react-toastify';
 import axios from 'axios';
 import { setUserInfo } from '../../redux/slices/authSlice';
 import { api } from '../../lib/api';
+import OtpModal from './otpModal';
 
 function UserSignUp() {
 
@@ -32,7 +33,6 @@ function UserSignUp() {
 
 
     const [showOtpModal, setShowOtpModal] = useState(false);
-    const [otp, setOtp] = useState("");
     const [otpError, setOtpError] = useState("");
     const [isOtpVerified, setIsOtpVerified] = useState(false);
 
@@ -40,6 +40,8 @@ function UserSignUp() {
     const [message, setMessage] = useState("");
     const [timer, setTimer] = useState(60);
     const [email, setEmail] = useState(formData.email)
+
+    
 
     const handleChange = (e) => {
         setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -118,14 +120,16 @@ function UserSignUp() {
         }
     };
 
-    const verifyOtpAndSignup = async () => {
+    const verifyOtpAndSignup = async (otp) => {
+        console.log("Thisd is the otp bu yusser" , otp);
+        
         try {
             // First verify OTP
             const verifyResponse = await axios.post("http://localhost:7000/api/user/otp/verify", {
                 email: formData.email.toLowerCase(),
-                otp
+                otp,
             });
-
+            
             if (verifyResponse.data.success) {
                 // If OTP is verified, proceed with signup
                 const signupData = {
@@ -135,7 +139,7 @@ function UserSignUp() {
                     password: formData.password
                 };
 
-                const response = await axios.post("http://localhost:7000/api/", signupData, {
+                const response = await axios.post("http://localhost:7000/api/signup", signupData, {
                     headers: {
                         'Content-Type': 'application/json'
                     },
@@ -164,25 +168,25 @@ function UserSignUp() {
         }
     };
 
-    const sendOtp = async () => {
-        try {
-            const { data } = await axios.post(`${api}/user/otp/send`, { email });
-            setOtpSent(true);
-            setMessage(data.message);
-            startTimer();
-        } catch (error) {
-            setMessage(error.response?.data?.message || "Error sending OTP");
-        }
-    };
+    // const sendOtp = async () => {
+    //     try {
+    //         const { data } = await axios.post(`${api}/user/otp/send`, { email });
+    //         setOtpSent(true);
+    //         setMessage(data.message);
+    //         startTimer();
+    //     } catch (error) {
+    //         setMessage(error.response?.data?.message || "Error sending OTP");
+    //     }
+    // };
 
-    const verifyOtp = async () => {
-        try {
-            const { data } = await axios.post(`${api}/user/otp/verify`, { email, otp });
-            setMessage(data.message);
-        } catch (error) {
-            setMessage(error.response?.data?.message || "Error verifying OTP");
-        }
-    };
+    // const verifyOtp = async () => {
+    //     try {
+    //         const { data } = await axios.post(`${api}/user/otp/verify`, { email, otp });
+    //         setMessage(data.message);
+    //     } catch (error) {
+    //         setMessage(error.response?.data?.message || "Error verifying OTP");
+    //     }
+    // };
 
     const startTimer = () => {
         setTimer(60);
@@ -194,40 +198,10 @@ function UserSignUp() {
         }, 1000);
     };
 
-    const OtpModal = () => {
-        if (!showOtpModal) return null;
-
-        return (
-            <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
-                <div className="bg-white p-8 rounded-xl shadow-lg w-96">
-                    <h2 className="text-xl font-bold mb-4">Enter OTP</h2>
-                    <p className="text-sm text-gray-600 mb-4">
-                        Please enter the OTP sent to your email
-                    </p>
-                    <Input
-                        type="text"
-                        placeholder="Enter OTP"
-                        value={otp}
-                        onChange={(e) => setOtp(e.target.value)}
-                        className="mb-4"
-                    />
-                    {otpError && <p className="text-red-500 text-sm mb-4">{otpError}</p>}
-                    <div className="flex gap-4">
-                        <Button onClick={verifyOtpAndSignup} className="flex-1">
-                            Verify OTP
-                        </Button>
-                        <Button
-                            variant="outline"
-                            onClick={() => setShowOtpModal(false)}
-                            className="flex-1"
-                        >
-                            Cancel
-                        </Button>
-                    </div>
-                </div>
-            </div>
-        );
-    };
+    const handleOtp = useCallback(()=>{
+        console.log();
+        
+    })
 
     return (
         <div className="flex items-center justify-center min-h-[80vh]">
@@ -389,7 +363,12 @@ function UserSignUp() {
                     </Button>
                 </div>
             </div>
-            <OtpModal />
+            <OtpModal 
+            formData={formData}
+            showOtpModal={showOtpModal}
+            setShowOtpModal={setShowOtpModal}
+            verifyOtpAndSignup={verifyOtpAndSignup} 
+            />
         </div>
     )
 }
