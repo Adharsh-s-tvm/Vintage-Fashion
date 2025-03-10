@@ -1,7 +1,43 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import axios from "axios";
+import { toast } from "sonner";
 
-const OtpModal = ({ formData, showOtpModal, setShowOtpModal, verifyOtpAndSignup  }) => {
-    const [otp, setOtp] = useState("");  // ✅ Define OTP inside the component
+const OtpModal = ({ formData, showOtpModal, setShowOtpModal, verifyOtpAndSignup }) => {
+    const [otp, setOtp] = useState("");
+    const [timer, setTimer] = useState(60);
+    const [canResend, setCanResend] = useState(false);
+
+    useEffect(() => {
+        let interval;
+        if (showOtpModal && timer > 0) {
+            interval = setInterval(() => {
+                setTimer((prev) => {
+                    if (prev === 1) {
+                        setCanResend(true);
+                    }
+                    return prev - 1;
+                });
+            }, 1000);
+        }
+        return () => clearInterval(interval);
+    }, [showOtpModal, timer]);
+
+    const handleResendOtp = async () => {
+        try {
+            const response = await axios.post("http://localhost:7000/api/user/otp/send", {
+                email: formData.email.toLowerCase()
+            });
+
+            if (response.data) {
+                toast.success("OTP resent successfully!", { position: "top-center" });
+                setTimer(60);
+                setCanResend(false);
+            }
+        } catch (error) {
+            const errorMessage = error.response?.data?.message || "Error resending OTP";
+            toast.error(errorMessage, { position: "top-center" });
+        }
+    };
 
     if (!showOtpModal) return null;
 
@@ -19,15 +55,28 @@ const OtpModal = ({ formData, showOtpModal, setShowOtpModal, verifyOtpAndSignup 
                     onChange={(e) => setOtp(e.target.value)}
                     className="mb-4 p-2 border rounded w-full"
                 />
+                <div className="text-sm text-gray-600 mb-4">
+                    {timer > 0 ? (
+                        <p>Resend OTP in {timer} seconds</p>
+                    ) : (
+                        <button
+                            onClick={handleResendOtp}
+                            className="text-blue-500 hover:text-blue-700"
+                            disabled={!canResend}
+                        >
+                            Resend OTP
+                        </button>
+                    )}
+                </div>
                 <div className="flex gap-4">
-                    <button 
-                        onClick={() => verifyOtpAndSignup(otp)} 
-                        className="flex-1 bg-blue-500 text-white p-2 rounded">
+                    <button
+                        onClick={() => verifyOtpAndSignup(otp)}
+                        className="flex-1 bg-blue-500 text-white p-2 rounded hover:bg-blue-600">
                         Verify OTP
                     </button>
                     <button
                         onClick={() => setShowOtpModal(false)}
-                        className="flex-1 border border-gray-300 p-2 rounded"
+                        className="flex-1 border border-gray-300 p-2 rounded hover:bg-gray-100"
                     >
                         Cancel
                     </button>
