@@ -11,7 +11,8 @@ import connectDB from './config/db.js'
 import userRoutes from './routes/userRoutes.js'
 import adminRoutes from "./routes/adminRoutes.js";
 import signUpOtpRoutes from './routes/signUpOtpRoutes.js'
-import productRoutes from './routes/productRoutes.js'
+import adminProductRoutes from './routes/adminProductRoutes.js'
+import userProductRoutes from './routes/userProductRoutes.js'
 import { errorHandler } from "./middlewares/errorHandler.js";
 
 dotenv.config()
@@ -34,8 +35,9 @@ app.use("/api", userRoutes);
 app.use("/api/admin", adminRoutes);
 
 
-app.use("/api/admin/products", productRoutes)
+app.use("/api/admin/products", adminProductRoutes)
 
+app.use("/api/products", userProductRoutes) 
 
 app.use("/api/user/otp", signUpOtpRoutes);
 

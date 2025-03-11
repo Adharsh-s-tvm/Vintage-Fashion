@@ -544,6 +544,23 @@ const ProductListing = () => {
   const [tempSizes, setTempSizes] = useState(selectedSizes);
   const [tempSort, setTempSort] = useState(sortBy);
 
+  const [products, setProducts] = useState([])
+
+  const fetchProducts = async (params) => {
+    //make api call to fetch products with params
+    try{
+        const response = await axios.get(`${api}/products?${params}`)
+        console.log("Products fetched " ,response.data)
+    } catch (error) {
+        console.log(error)
+    }
+    // setProducts(response.data)
+  }
+
+  useEffect((params) => {
+    fetchProducts(params)
+  },[])
+
   //aplying querry to url
   const handleApplyFilters = () => {
     setSelectedCategories(tempCategories);
@@ -573,6 +590,8 @@ const ProductListing = () => {
     tempSizes.forEach(size => params.append('size', size));
 
     setSearchParams(params);
+
+    fetchProducts(params)
   }
 
   const handleClearFilters = () => {
@@ -617,8 +636,8 @@ const ProductListing = () => {
 
   const fetchCategories = async () => {
     try {
-      const response = await axios.get(`${api}/admin/products/categories`);
-      console.log(response.data)
+      const response = await axios.get(`${api}/products/categories`);
+      console.log("Category fetched :",response.data)
       const categoriesData = response.data.categories || response.data;
       setCategories(categoriesData);
     } catch (error) {
