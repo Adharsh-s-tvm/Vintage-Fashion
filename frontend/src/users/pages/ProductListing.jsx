@@ -17,7 +17,10 @@ import { useSearchParams } from 'react-router';
 import { api } from '../../lib/api';
 import axios from 'axios';
 import { Categories } from '../layout/Categories';
+import { Slider } from "../../ui/slider";
 
+// Add this constant at the top of your file, outside the component
+const DEFAULT_SIZES = ['S', 'M', 'L', 'XL', 'XXL', 'XXXL'];
 
 // Mock product data with the new structure
 const products = [
@@ -524,16 +527,14 @@ const ProductListing = () => {
   const [searchParams, setSearchParams] = useSearchParams();
   const [priceRange, setPriceRange] = useState([
     Number(searchParams.get('minPrice')) || 0,
-    Number(searchParams.get('maxPrice')) || 4000
+    Number(searchParams.get('maxPrice')) || 10000
   ]);
   const [selectedCategories, setSelectedCategories] = useState([]);
   const [selectedBrands, setSelectedBrands] = useState([]);
   const [selectedSizes, setSelectedSizes] = useState(
     searchParams.getAll('size') || []
   );
-  const [sortBy, setSortBy] = useState(
-    searchParams.get('sort') || 'newest'
-  );
+  const [sortBy, setSortBy] = useState(searchParams.get('sort') || 'newest');
 
 
   // Temporary states for filter values before applying
@@ -547,6 +548,9 @@ const ProductListing = () => {
   const handleApplyFilters = () => {
     setSelectedCategories(tempCategories);
     setSelectedBrands(tempBrands);
+    setPriceRange(tempPriceRange);
+    setSortBy(tempSort);
+    setSelectedSizes(tempSizes);
 
     const params = new URLSearchParams();
 
@@ -556,11 +560,17 @@ const ProductListing = () => {
     // Add brands to params
     tempBrands.forEach(brandId => params.append('brand', brandId));
 
-    // Add other params if needed
-    if (tempPriceRange[0] !== 0) params.set('minPrice', tempPriceRange[0]);
-    if (tempPriceRange[1] !== 10000) params.set('maxPrice', tempPriceRange[1]);
-    if (tempSizes.length > 0) tempSizes.forEach(size => params.append('size', size));
-    if (tempSort !== 'newest') params.set('sort', tempSort);
+    // Add price range to params
+    params.set('minPrice', tempPriceRange[0]);
+    params.set('maxPrice', tempPriceRange[1]);
+
+    // Add sort parameter
+    if (tempSort !== 'newest') {
+      params.set('sort', tempSort);
+    }
+
+    // Add sizes to params
+    tempSizes.forEach(size => params.append('size', size));
 
     setSearchParams(params);
   }
@@ -570,6 +580,12 @@ const ProductListing = () => {
     setSelectedBrands([]);
     setTempCategories([]);
     setTempBrands([]);
+    setPriceRange([0, 10000]);
+    setTempPriceRange([0, 10000]);
+    setSortBy('newest');
+    setTempSort('newest');
+    setSelectedSizes([]);
+    setTempSizes([]);
     setSearchParams({});
   }
 
@@ -632,7 +648,7 @@ const ProductListing = () => {
 
   // Filter products based on selected filters
   const filteredProducts = products.filter(product => {
-    // Price filter - check if any variant is within price range
+    // Price filter
     const productLowestPrice = getLowestPrice(product);
     if (productLowestPrice < priceRange[0] || productLowestPrice > priceRange[1]) {
       return false;
@@ -648,9 +664,12 @@ const ProductListing = () => {
       return false;
     }
 
-    // Size filter - check if any variant has the selected size
-    if (selectedSizes.length > 0 && !product.variants.some(variant => selectedSizes.includes(variant.size))) {
-      return false;
+    // Size filter
+    if (selectedSizes.length > 0) {
+      const productSizes = product.variants.map(variant => variant.size);
+      if (!selectedSizes.some(size => productSizes.includes(size))) {
+        return false;
+      }
     }
 
     return true;
@@ -672,31 +691,16 @@ const ProductListing = () => {
     }
   });
 
-  // // Handle category toggle
-  // const handleCategoryChange = (category) => {
-  //     setSelectedCategories(prev =>
-  //         prev.includes(category)
-  //             ? prev.filter(cat => cat !== category)
-  //             : [...prev, category]
-  //     );
-  // };
-
-  // // Handle brand toggle
-  // const handleBrandChange = (brand) => {
-  //     setSelectedBrands(prev =>
-  //         prev.includes(brand)
-  //             ? prev.filter(b => b !== brand)
-  //             : [...prev, brand]
-  //     );
-  // };
-
   // Handle size toggle
   const handleSizeChange = (size) => {
-    setSelectedSizes(prev =>
-      prev.includes(size)
-        ? prev.filter(s => s !== size)
-        : [...prev, size]
-    );
+    setTempSizes(prev => {
+      const isSelected = prev.includes(size);
+      if (isSelected) {
+        return prev.filter(s => s !== size);
+      } else {
+        return [...prev, size];
+      }
+    });
   };
 
   // Initialize active images
@@ -759,38 +763,31 @@ const ProductListing = () => {
       <div className="mb-6">
         <h3 className="font-semibold text-lg mb-3">Price Range</h3>
         <div className="space-y-4">
+          <Slider
+            min={0}
+            max={10000}
+            step={100}
+            value={tempPriceRange}
+            onValueChange={setTempPriceRange}
+            className="mt-2"
+          />
           <div className="flex items-center justify-between">
-            <Input
-              type="number"
-              value={priceRange[0]}
-              onChange={(e) => setPriceRange([Number(e.target.value), priceRange[1]])}
-              className="w-24"
-              min={0}
-              step={100}
-            />
-            <span className="px-2">to</span>
-            <Input
-              type="number"
-              value={priceRange[1]}
-              onChange={(e) => setPriceRange([priceRange[0], Number(e.target.value)])}
-              className="w-24"
-              min={0}
-              step={100}
-            />
-          </div>
-          <div className="text-xs text-gray-500">
-            Prices are in paise (1/100 of a rupee)
+            <div className="text-sm">₹{tempPriceRange[0]}</div>
+            <div className="text-sm">₹{tempPriceRange[1]}</div>
           </div>
         </div>
       </div>
 
       <div className="mb-6">
         <h3 className="font-semibold text-lg mb-3">Sort By</h3>
-        <Select value={sortBy} onValueChange={(value) => setSortBy(value)}>
+        <Select
+          value={tempSort}
+          onValueChange={(value) => setTempSort(value)}
+        >
           <SelectTrigger className="w-full">
             <SelectValue placeholder="Select sort order" />
           </SelectTrigger>
-          <SelectContent >
+          <SelectContent>
             <SelectItem value="newest">Newest First</SelectItem>
             <SelectItem value="price-low">Price: Low to High</SelectItem>
             <SelectItem value="price-high">Price: High to Low</SelectItem>
@@ -823,11 +820,11 @@ const ProductListing = () => {
 
       <div className="mb-6">
         <h3 className="font-semibold text-lg mb-3">Size</h3>
-        <div className="grid grid-cols-4 gap-2">
-          {sizes.map((size) => (
+        <div className="grid grid-cols-3 gap-2">
+          {DEFAULT_SIZES.map((size) => (
             <Button
               key={size}
-              variant={selectedSizes.includes(size) ? "default" : "outline"}
+              variant={tempSizes.includes(size) ? "default" : "outline"}
               className="h-10 w-full"
               onClick={() => handleSizeChange(size)}
             >
