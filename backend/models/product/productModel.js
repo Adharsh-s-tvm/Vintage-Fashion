@@ -18,6 +18,10 @@ const productSchema = new mongoose.Schema(
       type: mongoose.Schema.Types.ObjectId,
       ref: "Brand",
     },
+    isListed: {
+      type: Boolean,
+      default: true,
+    },
     variants: [
       {
         type: mongoose.Schema.Types.ObjectId,
