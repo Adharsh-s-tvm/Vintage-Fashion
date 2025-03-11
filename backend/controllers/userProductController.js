@@ -17,7 +17,7 @@ export const getAllShopProducts = async (req, res) => {
             size,
             sort,
             page = 1,
-            limit = 8
+            limit = 1
         } = req.query;
 
 
