@@ -15,10 +15,24 @@ const Brand = () => {
   const [brandToToggle, setBrandToToggle] = useState(null);
   const [updatedName, setUpdatedName] = useState("");
   const [newBrand, setNewBrand] = useState("");
+  const [searchQuery, setSearchQuery] = useState('');
+  const [filteredBrands, setFilteredBrands] = useState([]);
 
   useEffect(() => {
     fetchBrands();
   }, []);
+
+  useEffect(() => {
+    if (brands.length > 0) {
+      const filtered = brands
+        .filter(brand =>
+          brand.name.toLowerCase().includes(searchQuery.toLowerCase())
+        )
+        .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+
+      setFilteredBrands(filtered);
+    }
+  }, [brands, searchQuery]);
 
   const fetchBrands = async () => {
     try {
@@ -125,12 +139,21 @@ const Brand = () => {
     <div className={`container mx-auto p-6 ${isOpen || isAddOpen || isConfirmOpen ? "backdrop-blur-sm" : ""}`}>
       <div className="flex justify-between items-center mb-4">
         <h2 className="text-2xl font-bold text-blue-800">Brand Management</h2>
-        <button
-          className="bg-green-500 hover:bg-green-700 text-white px-4 py-2 rounded"
-          onClick={openAddModal}
-        >
-          + Add Brand
-        </button>
+        <div className="flex gap-4">
+          <input
+            type="text"
+            placeholder="Search brands..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+          />
+          <button
+            className="bg-green-500 hover:bg-green-700 text-white px-4 py-2 rounded"
+            onClick={openAddModal}
+          >
+            + Add Brand
+          </button>
+        </div>
       </div>
 
       <div className="overflow-x-auto bg-white shadow-lg rounded-lg p-4">
@@ -144,7 +167,7 @@ const Brand = () => {
             </tr>
           </thead>
           <tbody>
-            {brands.map((brand) => (
+            {filteredBrands.map((brand) => (
               <tr key={brand._id} className="border-b border-gray-300">
                 <td className="p-3">{brand.name}</td>
                 <td className="p-3">

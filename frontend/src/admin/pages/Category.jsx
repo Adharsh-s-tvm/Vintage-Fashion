@@ -18,6 +18,8 @@ const Category = () => {
   const [updatedName, setUpdatedName] = useState("");
   const [newCategory, setNewCategory] = useState("");
   const [categoryToToggle, setCategoryToToggle] = useState(null);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [filteredCategories, setFilteredCategories] = useState([]);
 
   // Open & Close Modals
   function closeModal() {
@@ -52,6 +54,19 @@ const Category = () => {
   useEffect(() => {
     fetchCategories();
   }, []);
+
+  // Add this useEffect to handle search and sorting
+  useEffect(() => {
+    if (categories.length > 0) {
+      const filtered = categories
+        .filter(category =>
+          category.name.toLowerCase().includes(searchQuery.toLowerCase())
+        )
+        .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+
+      setFilteredCategories(filtered);
+    }
+  }, [categories, searchQuery]);
 
   const fetchCategories = async () => {
     try {
@@ -127,12 +142,21 @@ const Category = () => {
     <div className={`container mx-auto p-6 ${isOpen || isAddOpen ? "backdrop-blur-sm" : ""}`}>
       <div className="flex justify-between items-center mb-4">
         <h2 className="text-2xl font-bold text-blue-800">Category Management</h2>
-        <button
-          className="bg-green-500 hover:bg-green-700 text-white px-4 py-2 rounded"
-          onClick={openAddModal}
-        >
-          + Add Category
-        </button>
+        <div className="flex gap-4">
+          <input
+            type="text"
+            placeholder="Search categories..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+          />
+          <button
+            className="bg-green-500 hover:bg-green-700 text-white px-4 py-2 rounded"
+            onClick={openAddModal}
+          >
+            + Add Category
+          </button>
+        </div>
       </div>
 
       <div className="overflow-x-auto bg-white shadow-lg rounded-lg p-4">
@@ -146,7 +170,7 @@ const Category = () => {
             </tr>
           </thead>
           <tbody>
-            {categories.map((category) => (
+            {filteredCategories.map((category) => (
               <tr key={category._id} className="border-b border-gray-300">
                 <td className="p-3">{category.name}</td>
                 <td className="p-3">

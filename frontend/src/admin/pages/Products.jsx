@@ -63,6 +63,8 @@ const Products = () => {
   const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false);
   const [itemToDelete, setItemToDelete] = useState(null);
   const [deleteType, setDeleteType] = useState('');
+  const [searchQuery, setSearchQuery] = useState('');
+  const [filteredProducts, setFilteredProducts] = useState([]);
 
   useEffect(() => {
     fetchCategories();
@@ -78,6 +80,19 @@ const Products = () => {
       });
     };
   }, [imagePreview]);
+
+  useEffect(() => {
+    if (products.length > 0) {
+      const filtered = products
+        .filter(product =>
+          product.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          product.description.toLowerCase().includes(searchQuery.toLowerCase())
+        )
+        .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+
+      setFilteredProducts(filtered);
+    }
+  }, [products, searchQuery]);
 
   const fetchCategories = async () => {
     try {
@@ -382,6 +397,8 @@ const Products = () => {
           variant="outlined"
           size="small"
           placeholder="Search products..."
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
           sx={{
             backgroundColor: "#ffffff",
             borderRadius: 1,
@@ -442,12 +459,12 @@ const Products = () => {
               <TableRow>
                 <TableCell colSpan={6} align="center">Loading...</TableCell>
               </TableRow>
-            ) : products.length === 0 ? (
+            ) : filteredProducts.length === 0 ? (
               <TableRow>
                 <TableCell colSpan={6} align="center">No products found</TableCell>
               </TableRow>
             ) : (
-              products
+              filteredProducts
                 .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
                 .map((product) => (
                   <React.Fragment key={product._id}>
@@ -674,7 +691,7 @@ const Products = () => {
       <Box sx={{ display: "flex", justifyContent: "center", mt: 3 }}>
         <TablePagination
           component="div"
-          count={products.length}
+          count={filteredProducts.length}
           page={page}
           onPageChange={handleChangePage}
           rowsPerPage={rowsPerPage}
