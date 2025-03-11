@@ -440,76 +440,6 @@ const products = [
       }
     ],
     "__v": 0
-  },
-  {
-    "_id": "67ceed534be32cd5dc855a3a",
-    "name": "Regular Fit Lightweight bomber jacket",
-    "category": {
-      "_id": "67cc8961ce86f08c18a9a704",
-      "name": "Bomber Jackets"
-    },
-    "brand": {
-      "_id": "67cc8f4c0d745c14fcac9230",
-      "name": "Adidas"
-    },
-    "description": "Lightweight bomber jacket in woven fabric with a ribbed stand-up collar and zip down the front. Zipped side pockets and an inner pocket with a zip. Wide ribbing at the cuffs and hem. Regular fit for comfortable wear and a classic silhouette. Lined.",
-    "createdAt": "2025-03-10T13:46:59.425Z",
-    "updatedAt": "2025-03-10T13:56:00.080Z",
-    "variants": [
-      {
-        "_id": "67ceedc54be32cd5dc855a42",
-        "product": "67ceed534be32cd5dc855a3a",
-        "size": "XL",
-        "color": "Black",
-        "stock": 5,
-        "price": 2699,
-        "mainImage": "https://res.cloudinary.com/ds0nxlnxa/image/upload/v1741614532/jackets/udmuk0v3quym4ikcj7y7.avif",
-        "subImages": [
-          "https://res.cloudinary.com/ds0nxlnxa/image/upload/v1741614532/jackets/mdrb5t9r65eetefsjzjj.avif",
-          "https://res.cloudinary.com/ds0nxlnxa/image/upload/v1741614532/jackets/bjg4y2tbmmmrpl12mlzr.avif",
-          "https://res.cloudinary.com/ds0nxlnxa/image/upload/v1741614533/jackets/ufbck0nfmlikj40420ae.avif"
-        ],
-        "createdAt": "2025-03-10T13:48:53.970Z",
-        "updatedAt": "2025-03-10T13:48:53.970Z"
-      },
-      {
-        "_id": "67ceedfa4be32cd5dc855a4b",
-        "product": "67ceed534be32cd5dc855a3a",
-        "size": "L",
-        "color": "Black",
-        "stock": 7,
-        "price": 2699,
-        "mainImage": "https://res.cloudinary.com/ds0nxlnxa/image/upload/v1741614532/jackets/udmuk0v3quym4ikcj7y7.avif",
-        "subImages": [],
-        "createdAt": "2025-03-10T13:48:53.970Z",
-        "updatedAt": "2025-03-10T13:48:53.970Z"
-      },
-      {
-        "_id": "67ceee504be32cd5dc855a54",
-        "product": "67ceed534be32cd5dc855a3a",
-        "size": "M",
-        "color": "Black",
-        "stock": 3,
-        "price": 2699,
-        "mainImage": "https://res.cloudinary.com/ds0nxlnxa/image/upload/v1741614532/jackets/udmuk0v3quym4ikcj7y7.avif",
-        "subImages": [],
-        "createdAt": "2025-03-10T13:48:53.970Z",
-        "updatedAt": "2025-03-10T13:48:53.970Z"
-      },
-      {
-        "_id": "67ceee9b4be32cd5dc855a5d",
-        "product": "67ceed534be32cd5dc855a3a",
-        "size": "XXL",
-        "color": "Black",
-        "stock": 2,
-        "price": 2699,
-        "mainImage": "https://res.cloudinary.com/ds0nxlnxa/image/upload/v1741614532/jackets/udmuk0v3quym4ikcj7y7.avif",
-        "subImages": [],
-        "createdAt": "2025-03-10T13:48:53.970Z",
-        "updatedAt": "2025-03-10T13:48:53.970Z"
-      }
-    ],
-    "__v": 0
   }
   , {
     "_id": "67ceed534be32cd5dc855a3a",
@@ -588,6 +518,7 @@ const products = [
 const ProductListing = () => {
   const [activeImage, setActiveImage] = useState({});
   const [categories, setCategories] = useState([])
+  const [brands, setBrands] = useState([]);
 
   //search querries
   const [searchParams, setSearchParams] = useSearchParams();
@@ -596,9 +527,7 @@ const ProductListing = () => {
     Number(searchParams.get('maxPrice')) || 4000
   ]);
   const [selectedCategories, setSelectedCategories] = useState([]);
-  const [selectedBrands, setSelectedBrands] = useState(
-    searchParams.getAll('brand') || []
-  );
+  const [selectedBrands, setSelectedBrands] = useState([]);
   const [selectedSizes, setSelectedSizes] = useState(
     searchParams.getAll('size') || []
   );
@@ -610,22 +539,37 @@ const ProductListing = () => {
   // Temporary states for filter values before applying
   const [tempPriceRange, setTempPriceRange] = useState(priceRange);
   const [tempCategories, setTempCategories] = useState([]);
-  const [tempBrands, setTempBrands] = useState(selectedBrands);
+  const [tempBrands, setTempBrands] = useState([]);
   const [tempSizes, setTempSizes] = useState(selectedSizes);
   const [tempSort, setTempSort] = useState(sortBy);
 
   //aplying querry to url
   const handleApplyFilters = () => {
     setSelectedCategories(tempCategories);
+    setSelectedBrands(tempBrands);
 
     const params = new URLSearchParams();
+
+    // Add categories to params
     tempCategories.forEach(categoryId => params.append('category', categoryId));
+
+    // Add brands to params
+    tempBrands.forEach(brandId => params.append('brand', brandId));
+
+    // Add other params if needed
+    if (tempPriceRange[0] !== 0) params.set('minPrice', tempPriceRange[0]);
+    if (tempPriceRange[1] !== 10000) params.set('maxPrice', tempPriceRange[1]);
+    if (tempSizes.length > 0) tempSizes.forEach(size => params.append('size', size));
+    if (tempSort !== 'newest') params.set('sort', tempSort);
+
     setSearchParams(params);
   }
 
   const handleClearFilters = () => {
     setSelectedCategories([]);
+    setSelectedBrands([]);
     setTempCategories([]);
+    setTempBrands([]);
     setSearchParams({});
   }
 
@@ -639,12 +583,20 @@ const ProductListing = () => {
       }
     });
   }
-  const handleBrandChange = () => {
-
+  const handleBrandChange = (brand) => {
+    setTempBrands(prev => {
+      const isSelected = prev.includes(brand._id);
+      if (isSelected) {
+        return prev.filter(id => id !== brand._id);
+      } else {
+        return [...prev, brand._id];
+      }
+    });
   }
 
   useEffect(() => {
     fetchCategories();
+    fetchBrands();
   }, []);
 
   const fetchCategories = async () => {
@@ -658,12 +610,19 @@ const ProductListing = () => {
     }
   };
 
-
-
+  const fetchBrands = async () => {
+    try {
+      const response = await axios.get(`${api}/admin/products/brands`);
+      console.log('Brands response:', response.data);
+      const brandsData = response.data.brands || response.data;
+      setBrands(brandsData);
+    } catch (error) {
+      console.error('Failed to fetch brands:', error);
+    }
+  };
 
   // Extract unique categories, brands, and sizes for filters
 
-  const brands = [...new Set(products.map(product => product.brand.name))];
   const sizes = [...new Set(products.flatMap(product => product.variants.map(variant => variant.size)))];
 
   // Function to get lowest price variant for each product
@@ -685,7 +644,7 @@ const ProductListing = () => {
     }
 
     // Brand filter
-    if (selectedBrands.length > 0 && !selectedBrands.includes(product.brand.name)) {
+    if (selectedBrands.length > 0 && !selectedBrands.includes(product.brand._id)) {
       return false;
     }
 
@@ -831,7 +790,7 @@ const ProductListing = () => {
           <SelectTrigger className="w-full">
             <SelectValue placeholder="Select sort order" />
           </SelectTrigger>
-          <SelectContent>
+          <SelectContent >
             <SelectItem value="newest">Newest First</SelectItem>
             <SelectItem value="price-low">Price: Low to High</SelectItem>
             <SelectItem value="price-high">Price: High to Low</SelectItem>
@@ -845,17 +804,17 @@ const ProductListing = () => {
         <h3 className="font-semibold text-lg mb-3">Brands</h3>
         <div className="space-y-2">
           {brands.map((brand) => (
-            <div key={brand} className="flex items-center">
+            <div key={brand._id} className="flex items-center">
               <Checkbox
-                id={`brand-${brand.toLowerCase().replace(/\s+/g, '-')}`}
-                checked={selectedBrands.includes(brand)}
+                id={`brand-${brand._id}`}
+                checked={tempBrands.includes(brand._id)}
                 onCheckedChange={() => handleBrandChange(brand)}
               />
               <label
-                htmlFor={`brand-${brand.toLowerCase().replace(/\s+/g, '-')}`}
+                htmlFor={`brand-${brand._id}`}
                 className="ml-2 text-sm font-medium text-gray-700 cursor-pointer"
               >
-                {brand}
+                {brand.name}
               </label>
             </div>
           ))}
