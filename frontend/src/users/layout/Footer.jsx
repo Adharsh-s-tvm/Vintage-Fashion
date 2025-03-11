@@ -11,7 +11,7 @@ export function Footer() {
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
           <div className="col-span-1">
             <Link to="/ecommerce" className="text-xl font-bold text-gray-900">
-              JACKET<span className="text-primary">HUB</span>
+              VINT<span className="text-danger">AGE</span>
             </Link>
             <p className="mt-4 text-gray-600">
               Premium jacket collections for all seasons. Quality materials, timeless designs.
@@ -77,7 +77,7 @@ export function Footer() {
               </li>
               <li className="flex items-center">
                 <Mail className="h-5 w-5 text-gray-500 mr-2" />
-                <span className="text-gray-600">support@jackethub.com</span>
+                <span className="text-gray-600">support@vintage.com</span>
               </li>
             </ul>
 

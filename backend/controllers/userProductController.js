@@ -2,6 +2,7 @@ import Product from "../models/product/productModel.js";
 import Variant from "../models/product/sizeVariantModel.js";
 import Category from "../models/product/categoryModel.js";
 import Brand from "../models/product/brandModel.js";
+import mongoose from 'mongoose';
 
 
 
@@ -17,7 +18,7 @@ export const getAllShopProducts = async (req, res) => {
             size,
             sort,
             page = 1,
-            limit = 1
+            limit = 4
         } = req.query;
 
 
@@ -26,13 +27,17 @@ export const getAllShopProducts = async (req, res) => {
         // Category filter
         if (category) {
             const categoryIds = Array.isArray(category) ? category : [category];
-            baseQuery.category = { $in: categoryIds };
+            baseQuery.category = {
+                $in: categoryIds.map(id => new mongoose.Types.ObjectId(id))
+            };
         }
 
         // Brand filter
         if (brand) {
             const brandIds = Array.isArray(brand) ? brand : [brand];
-            baseQuery.brand = { $in: brandIds };
+            baseQuery.brand = {
+                $in: brandIds.map(id => new mongoose.Types.ObjectId(id))
+            };
         }
         // Size and Price filter using $lookup and $match
         const aggregationPipeline = [
