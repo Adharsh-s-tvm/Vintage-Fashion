@@ -1,341 +1,1000 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Layout } from '../layout/Layout';
-import { Card } from '../../ui/Card';
-import { Button } from '../../ui/Button';
-import { ShoppingCart, Heart, Star } from 'lucide-react';
+import { Card } from '../../ui/card';
+import { Button } from '../../ui/button';
+import { ShoppingCart, Heart, Star, ChevronLeft, ChevronRight } from 'lucide-react';
+import { cn } from '../../lib/util';
+import { Input } from '../../ui/input';
+import { Checkbox } from '../../ui/Checkbox';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '../../ui/select';
+import { useSearchParams } from 'react-router';
+import { api } from '../../lib/api';
+import axios from 'axios';
+import { Categories } from '../layout/Categories';
 
-// Mock product data
+
+// Mock product data with the new structure
 const products = [
-    {
-        id: 1,
-        name: "Winter Expedition Jacket",
-        price: 259.99,
-        rating: 4.8,
-        image: "https://images.unsplash.com/photo-1591047139829-d91aecb6caea?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1036&q=80",
-        category: "Winter",
-        brand: "North Face",
-        popular: true,
-        isNew: true,
-        featured: true,
+  {
+    "_id": "67ceed534be32cd5dc855a3a",
+    "name": "Regular Fit Lightweight bomber jacket",
+    "category": {
+      "_id": "67cc8961ce86f08c18a9a704",
+      "name": "Bomber Jackets"
     },
-    {
-        id: 2,
-        name: "Waterproof Rain Jacket",
-        price: 129.99,
-        rating: 4.5,
-        image: "https://images.unsplash.com/photo-1545594861-3bef43ff2fc8?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1035&q=80",
-        category: "Rain",
-        brand: "Columbia",
-        popular: true,
-        isNew: false,
-        featured: true,
+    "brand": {
+      "_id": "67cc8f4c0d745c14fcac9230",
+      "name": "Adidas"
     },
-    {
-        id: 3,
-        name: "Lightweight Windbreaker",
-        price: 89.99,
-        rating: 4.2,
-        image: "https://images.unsplash.com/photo-1548883354-94bcfe321cbb?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1039&q=80",
-        category: "Sport",
-        brand: "Adidas",
-        popular: false,
-        isNew: true,
-        featured: false,
+    "description": "Lightweight bomber jacket in woven fabric with a ribbed stand-up collar and zip down the front. Zipped side pockets and an inner pocket with a zip. Wide ribbing at the cuffs and hem. Regular fit for comfortable wear and a classic silhouette. Lined.",
+    "createdAt": "2025-03-10T13:46:59.425Z",
+    "updatedAt": "2025-03-10T13:56:00.080Z",
+    "variants": [
+      {
+        "_id": "67ceedc54be32cd5dc855a42",
+        "product": "67ceed534be32cd5dc855a3a",
+        "size": "XL",
+        "color": "Black",
+        "stock": 5,
+        "price": 2699,
+        "mainImage": "https://res.cloudinary.com/ds0nxlnxa/image/upload/v1741614532/jackets/udmuk0v3quym4ikcj7y7.avif",
+        "subImages": [
+          "https://res.cloudinary.com/ds0nxlnxa/image/upload/v1741614532/jackets/mdrb5t9r65eetefsjzjj.avif",
+          "https://res.cloudinary.com/ds0nxlnxa/image/upload/v1741614532/jackets/bjg4y2tbmmmrpl12mlzr.avif",
+          "https://res.cloudinary.com/ds0nxlnxa/image/upload/v1741614533/jackets/ufbck0nfmlikj40420ae.avif"
+        ],
+        "createdAt": "2025-03-10T13:48:53.970Z",
+        "updatedAt": "2025-03-10T13:48:53.970Z"
+      },
+      {
+        "_id": "67ceedfa4be32cd5dc855a4b",
+        "product": "67ceed534be32cd5dc855a3a",
+        "size": "L",
+        "color": "Black",
+        "stock": 7,
+        "price": 2699,
+        "mainImage": "https://res.cloudinary.com/ds0nxlnxa/image/upload/v1741614532/jackets/udmuk0v3quym4ikcj7y7.avif",
+        "subImages": [],
+        "createdAt": "2025-03-10T13:48:53.970Z",
+        "updatedAt": "2025-03-10T13:48:53.970Z"
+      },
+      {
+        "_id": "67ceee504be32cd5dc855a54",
+        "product": "67ceed534be32cd5dc855a3a",
+        "size": "M",
+        "color": "Black",
+        "stock": 3,
+        "price": 2699,
+        "mainImage": "https://res.cloudinary.com/ds0nxlnxa/image/upload/v1741614532/jackets/udmuk0v3quym4ikcj7y7.avif",
+        "subImages": [],
+        "createdAt": "2025-03-10T13:48:53.970Z",
+        "updatedAt": "2025-03-10T13:48:53.970Z"
+      },
+      {
+        "_id": "67ceee9b4be32cd5dc855a5d",
+        "product": "67ceed534be32cd5dc855a3a",
+        "size": "XXL",
+        "color": "Black",
+        "stock": 2,
+        "price": 2699,
+        "mainImage": "https://res.cloudinary.com/ds0nxlnxa/image/upload/v1741614532/jackets/udmuk0v3quym4ikcj7y7.avif",
+        "subImages": [],
+        "createdAt": "2025-03-10T13:48:53.970Z",
+        "updatedAt": "2025-03-10T13:48:53.970Z"
+      }
+    ],
+    "__v": 0
+  },
+  {
+    "_id": "67ceed534be32cd5dc855a3a",
+    "name": "Regular Fit Lightweight bomber jacket",
+    "category": {
+      "_id": "67cc8961ce86f08c18a9a704",
+      "name": "Bomber Jackets"
     },
-    {
-        id: 4,
-        name: "Premium Leather Jacket",
-        price: 349.99,
-        rating: 4.9,
-        image: "https://images.unsplash.com/photo-1551028719-00167b16eac5?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1035&q=80",
-        category: "Leather",
-        brand: "Patagonia",
-        popular: true,
-        isNew: false,
-        featured: true,
+    "brand": {
+      "_id": "67cc8f4c0d745c14fcac9230",
+      "name": "Adidas"
     },
-    {
-        id: 5,
-        name: "Denim Trucker Jacket",
-        price: 119.99,
-        rating: 4.3,
-        image: "https://images.unsplash.com/photo-1516257984-b1b4d707412e?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1037&q=80",
-        category: "Denim",
-        brand: "Nike",
-        popular: false,
-        isNew: true,
-        featured: false,
+    "description": "Lightweight bomber jacket in woven fabric with a ribbed stand-up collar and zip down the front. Zipped side pockets and an inner pocket with a zip. Wide ribbing at the cuffs and hem. Regular fit for comfortable wear and a classic silhouette. Lined.",
+    "createdAt": "2025-03-10T13:46:59.425Z",
+    "updatedAt": "2025-03-10T13:56:00.080Z",
+    "variants": [
+      {
+        "_id": "67ceedc54be32cd5dc855a42",
+        "product": "67ceed534be32cd5dc855a3a",
+        "size": "XL",
+        "color": "Black",
+        "stock": 5,
+        "price": 2699,
+        "mainImage": "https://res.cloudinary.com/ds0nxlnxa/image/upload/v1741614532/jackets/udmuk0v3quym4ikcj7y7.avif",
+        "subImages": [
+          "https://res.cloudinary.com/ds0nxlnxa/image/upload/v1741614532/jackets/mdrb5t9r65eetefsjzjj.avif",
+          "https://res.cloudinary.com/ds0nxlnxa/image/upload/v1741614532/jackets/bjg4y2tbmmmrpl12mlzr.avif",
+          "https://res.cloudinary.com/ds0nxlnxa/image/upload/v1741614533/jackets/ufbck0nfmlikj40420ae.avif"
+        ],
+        "createdAt": "2025-03-10T13:48:53.970Z",
+        "updatedAt": "2025-03-10T13:48:53.970Z"
+      },
+      {
+        "_id": "67ceedfa4be32cd5dc855a4b",
+        "product": "67ceed534be32cd5dc855a3a",
+        "size": "L",
+        "color": "Black",
+        "stock": 7,
+        "price": 2699,
+        "mainImage": "https://res.cloudinary.com/ds0nxlnxa/image/upload/v1741614532/jackets/udmuk0v3quym4ikcj7y7.avif",
+        "subImages": [],
+        "createdAt": "2025-03-10T13:48:53.970Z",
+        "updatedAt": "2025-03-10T13:48:53.970Z"
+      },
+      {
+        "_id": "67ceee504be32cd5dc855a54",
+        "product": "67ceed534be32cd5dc855a3a",
+        "size": "M",
+        "color": "Black",
+        "stock": 3,
+        "price": 2699,
+        "mainImage": "https://res.cloudinary.com/ds0nxlnxa/image/upload/v1741614532/jackets/udmuk0v3quym4ikcj7y7.avif",
+        "subImages": [],
+        "createdAt": "2025-03-10T13:48:53.970Z",
+        "updatedAt": "2025-03-10T13:48:53.970Z"
+      },
+      {
+        "_id": "67ceee9b4be32cd5dc855a5d",
+        "product": "67ceed534be32cd5dc855a3a",
+        "size": "XXL",
+        "color": "Black",
+        "stock": 2,
+        "price": 2699,
+        "mainImage": "https://res.cloudinary.com/ds0nxlnxa/image/upload/v1741614532/jackets/udmuk0v3quym4ikcj7y7.avif",
+        "subImages": [],
+        "createdAt": "2025-03-10T13:48:53.970Z",
+        "updatedAt": "2025-03-10T13:48:53.970Z"
+      }
+    ],
+    "__v": 0
+  },
+  {
+    "_id": "67ceed534be32cd5dc855a3a",
+    "name": "Regular Fit Lightweight bomber jacket",
+    "category": {
+      "_id": "67cc8961ce86f08c18a9a704",
+      "name": "Bomber Jackets"
     },
-    {
-        id: 6,
-        name: "Insulated Ski Jacket",
-        price: 299.99,
-        rating: 4.7,
-        image: "https://images.unsplash.com/photo-1542327897-4141b355e20e?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=987&q=80",
-        category: "Winter",
-        brand: "North Face",
-        popular: true,
-        isNew: false,
-        featured: true,
+    "brand": {
+      "_id": "67cc8f4c0d745c14fcac9230",
+      "name": "Adidas"
     },
-    {
-        id: 7,
-        name: "Vintage Denim Jacket",
-        price: 149.99,
-        rating: 4.4,
-        image: "https://images.unsplash.com/photo-1576871337622-98d48d1cf531?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=987&q=80",
-        category: "Denim",
-        brand: "Columbia",
-        popular: false,
-        isNew: true,
-        featured: false,
+    "description": "Lightweight bomber jacket in woven fabric with a ribbed stand-up collar and zip down the front. Zipped side pockets and an inner pocket with a zip. Wide ribbing at the cuffs and hem. Regular fit for comfortable wear and a classic silhouette. Lined.",
+    "createdAt": "2025-03-10T13:46:59.425Z",
+    "updatedAt": "2025-03-10T13:56:00.080Z",
+    "variants": [
+      {
+        "_id": "67ceedc54be32cd5dc855a42",
+        "product": "67ceed534be32cd5dc855a3a",
+        "size": "XL",
+        "color": "Black",
+        "stock": 5,
+        "price": 2699,
+        "mainImage": "https://res.cloudinary.com/ds0nxlnxa/image/upload/v1741614532/jackets/udmuk0v3quym4ikcj7y7.avif",
+        "subImages": [
+          "https://res.cloudinary.com/ds0nxlnxa/image/upload/v1741614532/jackets/mdrb5t9r65eetefsjzjj.avif",
+          "https://res.cloudinary.com/ds0nxlnxa/image/upload/v1741614532/jackets/bjg4y2tbmmmrpl12mlzr.avif",
+          "https://res.cloudinary.com/ds0nxlnxa/image/upload/v1741614533/jackets/ufbck0nfmlikj40420ae.avif"
+        ],
+        "createdAt": "2025-03-10T13:48:53.970Z",
+        "updatedAt": "2025-03-10T13:48:53.970Z"
+      },
+      {
+        "_id": "67ceedfa4be32cd5dc855a4b",
+        "product": "67ceed534be32cd5dc855a3a",
+        "size": "L",
+        "color": "Black",
+        "stock": 7,
+        "price": 2699,
+        "mainImage": "https://res.cloudinary.com/ds0nxlnxa/image/upload/v1741614532/jackets/udmuk0v3quym4ikcj7y7.avif",
+        "subImages": [],
+        "createdAt": "2025-03-10T13:48:53.970Z",
+        "updatedAt": "2025-03-10T13:48:53.970Z"
+      },
+      {
+        "_id": "67ceee504be32cd5dc855a54",
+        "product": "67ceed534be32cd5dc855a3a",
+        "size": "M",
+        "color": "Black",
+        "stock": 3,
+        "price": 2699,
+        "mainImage": "https://res.cloudinary.com/ds0nxlnxa/image/upload/v1741614532/jackets/udmuk0v3quym4ikcj7y7.avif",
+        "subImages": [],
+        "createdAt": "2025-03-10T13:48:53.970Z",
+        "updatedAt": "2025-03-10T13:48:53.970Z"
+      },
+      {
+        "_id": "67ceee9b4be32cd5dc855a5d",
+        "product": "67ceed534be32cd5dc855a3a",
+        "size": "XXL",
+        "color": "Black",
+        "stock": 2,
+        "price": 2699,
+        "mainImage": "https://res.cloudinary.com/ds0nxlnxa/image/upload/v1741614532/jackets/udmuk0v3quym4ikcj7y7.avif",
+        "subImages": [],
+        "createdAt": "2025-03-10T13:48:53.970Z",
+        "updatedAt": "2025-03-10T13:48:53.970Z"
+      }
+    ],
+    "__v": 0
+  },
+  {
+    "_id": "67ceed534be32cd5dc855a3a",
+    "name": "Regular Fit Lightweight bomber jacket",
+    "category": {
+      "_id": "67cc8961ce86f08c18a9a704",
+      "name": "Bomber Jackets"
     },
-    {
-        id: 8,
-        name: "Lightweight Running Jacket",
-        price: 79.99,
-        rating: 4.1,
-        image: "https://images.unsplash.com/photo-1550639525-c97d455acf70?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1026&q=80",
-        category: "Sport",
-        brand: "Adidas",
-        popular: true,
-        isNew: true,
-        featured: false,
-    }
+    "brand": {
+      "_id": "67cc8f4c0d745c14fcac9230",
+      "name": "Adidas"
+    },
+    "description": "Lightweight bomber jacket in woven fabric with a ribbed stand-up collar and zip down the front. Zipped side pockets and an inner pocket with a zip. Wide ribbing at the cuffs and hem. Regular fit for comfortable wear and a classic silhouette. Lined.",
+    "createdAt": "2025-03-10T13:46:59.425Z",
+    "updatedAt": "2025-03-10T13:56:00.080Z",
+    "variants": [
+      {
+        "_id": "67ceedc54be32cd5dc855a42",
+        "product": "67ceed534be32cd5dc855a3a",
+        "size": "XL",
+        "color": "Black",
+        "stock": 5,
+        "price": 2699,
+        "mainImage": "https://res.cloudinary.com/ds0nxlnxa/image/upload/v1741614532/jackets/udmuk0v3quym4ikcj7y7.avif",
+        "subImages": [
+          "https://res.cloudinary.com/ds0nxlnxa/image/upload/v1741614532/jackets/mdrb5t9r65eetefsjzjj.avif",
+          "https://res.cloudinary.com/ds0nxlnxa/image/upload/v1741614532/jackets/bjg4y2tbmmmrpl12mlzr.avif",
+          "https://res.cloudinary.com/ds0nxlnxa/image/upload/v1741614533/jackets/ufbck0nfmlikj40420ae.avif"
+        ],
+        "createdAt": "2025-03-10T13:48:53.970Z",
+        "updatedAt": "2025-03-10T13:48:53.970Z"
+      },
+      {
+        "_id": "67ceedfa4be32cd5dc855a4b",
+        "product": "67ceed534be32cd5dc855a3a",
+        "size": "L",
+        "color": "Black",
+        "stock": 7,
+        "price": 2699,
+        "mainImage": "https://res.cloudinary.com/ds0nxlnxa/image/upload/v1741614532/jackets/udmuk0v3quym4ikcj7y7.avif",
+        "subImages": [],
+        "createdAt": "2025-03-10T13:48:53.970Z",
+        "updatedAt": "2025-03-10T13:48:53.970Z"
+      },
+      {
+        "_id": "67ceee504be32cd5dc855a54",
+        "product": "67ceed534be32cd5dc855a3a",
+        "size": "M",
+        "color": "Black",
+        "stock": 3,
+        "price": 2699,
+        "mainImage": "https://res.cloudinary.com/ds0nxlnxa/image/upload/v1741614532/jackets/udmuk0v3quym4ikcj7y7.avif",
+        "subImages": [],
+        "createdAt": "2025-03-10T13:48:53.970Z",
+        "updatedAt": "2025-03-10T13:48:53.970Z"
+      },
+      {
+        "_id": "67ceee9b4be32cd5dc855a5d",
+        "product": "67ceed534be32cd5dc855a3a",
+        "size": "XXL",
+        "color": "Black",
+        "stock": 2,
+        "price": 2699,
+        "mainImage": "https://res.cloudinary.com/ds0nxlnxa/image/upload/v1741614532/jackets/udmuk0v3quym4ikcj7y7.avif",
+        "subImages": [],
+        "createdAt": "2025-03-10T13:48:53.970Z",
+        "updatedAt": "2025-03-10T13:48:53.970Z"
+      }
+    ],
+    "__v": 0
+  },
+  {
+    "_id": "67ceed534be32cd5dc855a3a",
+    "name": "Regular Fit Lightweight bomber jacket",
+    "category": {
+      "_id": "67cc8961ce86f08c18a9a704",
+      "name": "Bomber Jackets"
+    },
+    "brand": {
+      "_id": "67cc8f4c0d745c14fcac9230",
+      "name": "Adidas"
+    },
+    "description": "Lightweight bomber jacket in woven fabric with a ribbed stand-up collar and zip down the front. Zipped side pockets and an inner pocket with a zip. Wide ribbing at the cuffs and hem. Regular fit for comfortable wear and a classic silhouette. Lined.",
+    "createdAt": "2025-03-10T13:46:59.425Z",
+    "updatedAt": "2025-03-10T13:56:00.080Z",
+    "variants": [
+      {
+        "_id": "67ceedc54be32cd5dc855a42",
+        "product": "67ceed534be32cd5dc855a3a",
+        "size": "XL",
+        "color": "Black",
+        "stock": 5,
+        "price": 2699,
+        "mainImage": "https://res.cloudinary.com/ds0nxlnxa/image/upload/v1741614532/jackets/udmuk0v3quym4ikcj7y7.avif",
+        "subImages": [
+          "https://res.cloudinary.com/ds0nxlnxa/image/upload/v1741614532/jackets/mdrb5t9r65eetefsjzjj.avif",
+          "https://res.cloudinary.com/ds0nxlnxa/image/upload/v1741614532/jackets/bjg4y2tbmmmrpl12mlzr.avif",
+          "https://res.cloudinary.com/ds0nxlnxa/image/upload/v1741614533/jackets/ufbck0nfmlikj40420ae.avif"
+        ],
+        "createdAt": "2025-03-10T13:48:53.970Z",
+        "updatedAt": "2025-03-10T13:48:53.970Z"
+      },
+      {
+        "_id": "67ceedfa4be32cd5dc855a4b",
+        "product": "67ceed534be32cd5dc855a3a",
+        "size": "L",
+        "color": "Black",
+        "stock": 7,
+        "price": 2699,
+        "mainImage": "https://res.cloudinary.com/ds0nxlnxa/image/upload/v1741614532/jackets/udmuk0v3quym4ikcj7y7.avif",
+        "subImages": [],
+        "createdAt": "2025-03-10T13:48:53.970Z",
+        "updatedAt": "2025-03-10T13:48:53.970Z"
+      },
+      {
+        "_id": "67ceee504be32cd5dc855a54",
+        "product": "67ceed534be32cd5dc855a3a",
+        "size": "M",
+        "color": "Black",
+        "stock": 3,
+        "price": 2699,
+        "mainImage": "https://res.cloudinary.com/ds0nxlnxa/image/upload/v1741614532/jackets/udmuk0v3quym4ikcj7y7.avif",
+        "subImages": [],
+        "createdAt": "2025-03-10T13:48:53.970Z",
+        "updatedAt": "2025-03-10T13:48:53.970Z"
+      },
+      {
+        "_id": "67ceee9b4be32cd5dc855a5d",
+        "product": "67ceed534be32cd5dc855a3a",
+        "size": "XXL",
+        "color": "Black",
+        "stock": 2,
+        "price": 2699,
+        "mainImage": "https://res.cloudinary.com/ds0nxlnxa/image/upload/v1741614532/jackets/udmuk0v3quym4ikcj7y7.avif",
+        "subImages": [],
+        "createdAt": "2025-03-10T13:48:53.970Z",
+        "updatedAt": "2025-03-10T13:48:53.970Z"
+      }
+    ],
+    "__v": 0
+  },
+  {
+    "_id": "67ceed534be32cd5dc855a3a",
+    "name": "Regular Fit Lightweight bomber jacket",
+    "category": {
+      "_id": "67cc8961ce86f08c18a9a704",
+      "name": "Bomber Jackets"
+    },
+    "brand": {
+      "_id": "67cc8f4c0d745c14fcac9230",
+      "name": "Adidas"
+    },
+    "description": "Lightweight bomber jacket in woven fabric with a ribbed stand-up collar and zip down the front. Zipped side pockets and an inner pocket with a zip. Wide ribbing at the cuffs and hem. Regular fit for comfortable wear and a classic silhouette. Lined.",
+    "createdAt": "2025-03-10T13:46:59.425Z",
+    "updatedAt": "2025-03-10T13:56:00.080Z",
+    "variants": [
+      {
+        "_id": "67ceedc54be32cd5dc855a42",
+        "product": "67ceed534be32cd5dc855a3a",
+        "size": "XL",
+        "color": "Black",
+        "stock": 5,
+        "price": 2699,
+        "mainImage": "https://res.cloudinary.com/ds0nxlnxa/image/upload/v1741614532/jackets/udmuk0v3quym4ikcj7y7.avif",
+        "subImages": [
+          "https://res.cloudinary.com/ds0nxlnxa/image/upload/v1741614532/jackets/mdrb5t9r65eetefsjzjj.avif",
+          "https://res.cloudinary.com/ds0nxlnxa/image/upload/v1741614532/jackets/bjg4y2tbmmmrpl12mlzr.avif",
+          "https://res.cloudinary.com/ds0nxlnxa/image/upload/v1741614533/jackets/ufbck0nfmlikj40420ae.avif"
+        ],
+        "createdAt": "2025-03-10T13:48:53.970Z",
+        "updatedAt": "2025-03-10T13:48:53.970Z"
+      },
+      {
+        "_id": "67ceedfa4be32cd5dc855a4b",
+        "product": "67ceed534be32cd5dc855a3a",
+        "size": "L",
+        "color": "Black",
+        "stock": 7,
+        "price": 2699,
+        "mainImage": "https://res.cloudinary.com/ds0nxlnxa/image/upload/v1741614532/jackets/udmuk0v3quym4ikcj7y7.avif",
+        "subImages": [],
+        "createdAt": "2025-03-10T13:48:53.970Z",
+        "updatedAt": "2025-03-10T13:48:53.970Z"
+      },
+      {
+        "_id": "67ceee504be32cd5dc855a54",
+        "product": "67ceed534be32cd5dc855a3a",
+        "size": "M",
+        "color": "Black",
+        "stock": 3,
+        "price": 2699,
+        "mainImage": "https://res.cloudinary.com/ds0nxlnxa/image/upload/v1741614532/jackets/udmuk0v3quym4ikcj7y7.avif",
+        "subImages": [],
+        "createdAt": "2025-03-10T13:48:53.970Z",
+        "updatedAt": "2025-03-10T13:48:53.970Z"
+      },
+      {
+        "_id": "67ceee9b4be32cd5dc855a5d",
+        "product": "67ceed534be32cd5dc855a3a",
+        "size": "XXL",
+        "color": "Black",
+        "stock": 2,
+        "price": 2699,
+        "mainImage": "https://res.cloudinary.com/ds0nxlnxa/image/upload/v1741614532/jackets/udmuk0v3quym4ikcj7y7.avif",
+        "subImages": [],
+        "createdAt": "2025-03-10T13:48:53.970Z",
+        "updatedAt": "2025-03-10T13:48:53.970Z"
+      }
+    ],
+    "__v": 0
+  },
+  {
+    "_id": "67ceed534be32cd5dc855a3a",
+    "name": "Regular Fit Lightweight bomber jacket",
+    "category": {
+      "_id": "67cc8961ce86f08c18a9a704",
+      "name": "Bomber Jackets"
+    },
+    "brand": {
+      "_id": "67cc8f4c0d745c14fcac9230",
+      "name": "Adidas"
+    },
+    "description": "Lightweight bomber jacket in woven fabric with a ribbed stand-up collar and zip down the front. Zipped side pockets and an inner pocket with a zip. Wide ribbing at the cuffs and hem. Regular fit for comfortable wear and a classic silhouette. Lined.",
+    "createdAt": "2025-03-10T13:46:59.425Z",
+    "updatedAt": "2025-03-10T13:56:00.080Z",
+    "variants": [
+      {
+        "_id": "67ceedc54be32cd5dc855a42",
+        "product": "67ceed534be32cd5dc855a3a",
+        "size": "XL",
+        "color": "Black",
+        "stock": 5,
+        "price": 2699,
+        "mainImage": "https://res.cloudinary.com/ds0nxlnxa/image/upload/v1741614532/jackets/udmuk0v3quym4ikcj7y7.avif",
+        "subImages": [
+          "https://res.cloudinary.com/ds0nxlnxa/image/upload/v1741614532/jackets/mdrb5t9r65eetefsjzjj.avif",
+          "https://res.cloudinary.com/ds0nxlnxa/image/upload/v1741614532/jackets/bjg4y2tbmmmrpl12mlzr.avif",
+          "https://res.cloudinary.com/ds0nxlnxa/image/upload/v1741614533/jackets/ufbck0nfmlikj40420ae.avif"
+        ],
+        "createdAt": "2025-03-10T13:48:53.970Z",
+        "updatedAt": "2025-03-10T13:48:53.970Z"
+      },
+      {
+        "_id": "67ceedfa4be32cd5dc855a4b",
+        "product": "67ceed534be32cd5dc855a3a",
+        "size": "L",
+        "color": "Black",
+        "stock": 7,
+        "price": 2699,
+        "mainImage": "https://res.cloudinary.com/ds0nxlnxa/image/upload/v1741614532/jackets/udmuk0v3quym4ikcj7y7.avif",
+        "subImages": [],
+        "createdAt": "2025-03-10T13:48:53.970Z",
+        "updatedAt": "2025-03-10T13:48:53.970Z"
+      },
+      {
+        "_id": "67ceee504be32cd5dc855a54",
+        "product": "67ceed534be32cd5dc855a3a",
+        "size": "M",
+        "color": "Black",
+        "stock": 3,
+        "price": 2699,
+        "mainImage": "https://res.cloudinary.com/ds0nxlnxa/image/upload/v1741614532/jackets/udmuk0v3quym4ikcj7y7.avif",
+        "subImages": [],
+        "createdAt": "2025-03-10T13:48:53.970Z",
+        "updatedAt": "2025-03-10T13:48:53.970Z"
+      },
+      {
+        "_id": "67ceee9b4be32cd5dc855a5d",
+        "product": "67ceed534be32cd5dc855a3a",
+        "size": "XXL",
+        "color": "Black",
+        "stock": 2,
+        "price": 2699,
+        "mainImage": "https://res.cloudinary.com/ds0nxlnxa/image/upload/v1741614532/jackets/udmuk0v3quym4ikcj7y7.avif",
+        "subImages": [],
+        "createdAt": "2025-03-10T13:48:53.970Z",
+        "updatedAt": "2025-03-10T13:48:53.970Z"
+      }
+    ],
+    "__v": 0
+  }
+  , {
+    "_id": "67ceed534be32cd5dc855a3a",
+    "name": "Regular Fit Lightweight bomber jacket",
+    "category": {
+      "_id": "67cc8961ce86f08c18a9a704",
+      "name": "Bomber Jackets"
+    },
+    "brand": {
+      "_id": "67cc8f4c0d745c14fcac9230",
+      "name": "Adidas"
+    },
+    "description": "Lightweight bomber jacket in woven fabric with a ribbed stand-up collar and zip down the front. Zipped side pockets and an inner pocket with a zip. Wide ribbing at the cuffs and hem. Regular fit for comfortable wear and a classic silhouette. Lined.",
+    "createdAt": "2025-03-10T13:46:59.425Z",
+    "updatedAt": "2025-03-10T13:56:00.080Z",
+    "variants": [
+      {
+        "_id": "67ceedc54be32cd5dc855a42",
+        "product": "67ceed534be32cd5dc855a3a",
+        "size": "XL",
+        "color": "Black",
+        "stock": 5,
+        "price": 2699,
+        "mainImage": "https://res.cloudinary.com/ds0nxlnxa/image/upload/v1741614532/jackets/udmuk0v3quym4ikcj7y7.avif",
+        "subImages": [
+          "https://res.cloudinary.com/ds0nxlnxa/image/upload/v1741614532/jackets/mdrb5t9r65eetefsjzjj.avif",
+          "https://res.cloudinary.com/ds0nxlnxa/image/upload/v1741614532/jackets/bjg4y2tbmmmrpl12mlzr.avif",
+          "https://res.cloudinary.com/ds0nxlnxa/image/upload/v1741614533/jackets/ufbck0nfmlikj40420ae.avif"
+        ],
+        "createdAt": "2025-03-10T13:48:53.970Z",
+        "updatedAt": "2025-03-10T13:48:53.970Z"
+      },
+      {
+        "_id": "67ceedfa4be32cd5dc855a4b",
+        "product": "67ceed534be32cd5dc855a3a",
+        "size": "L",
+        "color": "Black",
+        "stock": 7,
+        "price": 2699,
+        "mainImage": "https://res.cloudinary.com/ds0nxlnxa/image/upload/v1741614532/jackets/udmuk0v3quym4ikcj7y7.avif",
+        "subImages": [],
+        "createdAt": "2025-03-10T13:48:53.970Z",
+        "updatedAt": "2025-03-10T13:48:53.970Z"
+      },
+      {
+        "_id": "67ceee504be32cd5dc855a54",
+        "product": "67ceed534be32cd5dc855a3a",
+        "size": "M",
+        "color": "Black",
+        "stock": 3,
+        "price": 2699,
+        "mainImage": "https://res.cloudinary.com/ds0nxlnxa/image/upload/v1741614532/jackets/udmuk0v3quym4ikcj7y7.avif",
+        "subImages": [],
+        "createdAt": "2025-03-10T13:48:53.970Z",
+        "updatedAt": "2025-03-10T13:48:53.970Z"
+      },
+      {
+        "_id": "67ceee9b4be32cd5dc855a5d",
+        "product": "67ceed534be32cd5dc855a3a",
+        "size": "XXL",
+        "color": "Black",
+        "stock": 2,
+        "price": 2699,
+        "mainImage": "https://res.cloudinary.com/ds0nxlnxa/image/upload/v1741614532/jackets/udmuk0v3quym4ikcj7y7.avif",
+        "subImages": [],
+        "createdAt": "2025-03-10T13:48:53.970Z",
+        "updatedAt": "2025-03-10T13:48:53.970Z"
+      }
+    ],
+    "__v": 0
+  }
 ];
 
+
+
 const ProductListing = () => {
-    const [priceRange, setPriceRange] = useState([0, 400]);
-    const [selectedCategories, setSelectedCategories] = useState([]);
-    const [selectedBrands, setSelectedBrands] = useState([]);
-    const [sortBy, setSortBy] = useState('newest');
+  const [activeImage, setActiveImage] = useState({});
+  const [categories, setCategories] = useState([])
 
-    // Extract unique categories and brands for filters
-    const categories = [...new Set(products.map(product => product.category))];
-    const brands = [...new Set(products.map(product => product.brand))];
+  //search querries
+  const [searchParams, setSearchParams] = useSearchParams();
+  const [priceRange, setPriceRange] = useState([
+    Number(searchParams.get('minPrice')) || 0,
+    Number(searchParams.get('maxPrice')) || 4000
+  ]);
+  const [selectedCategories, setSelectedCategories] = useState([]);
+  const [selectedBrands, setSelectedBrands] = useState(
+    searchParams.getAll('brand') || []
+  );
+  const [selectedSizes, setSelectedSizes] = useState(
+    searchParams.getAll('size') || []
+  );
+  const [sortBy, setSortBy] = useState(
+    searchParams.get('sort') || 'newest'
+  );
 
-    // Filter products based on selected filters
-    const filteredProducts = products.filter(product => {
-        // Price filter
-        if (product.price < priceRange[0] || product.price > priceRange[1]) {
-            return false;
-        }
 
-        // Category filter
-        if (selectedCategories.length > 0 && !selectedCategories.includes(product.category)) {
-            return false;
-        }
+  // Temporary states for filter values before applying
+  const [tempPriceRange, setTempPriceRange] = useState(priceRange);
+  const [tempCategories, setTempCategories] = useState([]);
+  const [tempBrands, setTempBrands] = useState(selectedBrands);
+  const [tempSizes, setTempSizes] = useState(selectedSizes);
+  const [tempSort, setTempSort] = useState(sortBy);
 
-        // Brand filter
-        if (selectedBrands.length > 0 && !selectedBrands.includes(product.brand)) {
-            return false;
-        }
+  //aplying querry to url
+  const handleApplyFilters = () => {
+    setSelectedCategories(tempCategories);
 
-        return true;
+    const params = new URLSearchParams();
+    tempCategories.forEach(categoryId => params.append('category', categoryId));
+    setSearchParams(params);
+  }
+
+  const handleClearFilters = () => {
+    setSelectedCategories([]);
+    setTempCategories([]);
+    setSearchParams({});
+  }
+
+  const handleCategoryChange = (category) => {
+    setTempCategories(prev => {
+      const isSelected = prev.includes(category._id);
+      if (isSelected) {
+        return prev.filter(id => id !== category._id);
+      } else {
+        return [...prev, category._id];
+      }
     });
+  }
+  const handleBrandChange = () => {
 
-    // Sort products based on selected sort option
-    const sortedProducts = [...filteredProducts].sort((a, b) => {
-        switch (sortBy) {
-            case 'price-low':
-                return a.price - b.price;
-            case 'price-high':
-                return b.price - a.price;
-            case 'a-z':
-                return a.name.localeCompare(b.name);
-            case 'z-a':
-                return b.name.localeCompare(a.name);
-            case 'popular':
-                return a.popular === b.popular ? 0 : a.popular ? -1 : 1;
-            case 'rating':
-                return b.rating - a.rating;
-            case 'featured':
-                return a.featured === b.featured ? 0 : a.featured ? -1 : 1;
-            default: // newest
-                return a.isNew === b.isNew ? 0 : a.isNew ? -1 : 1;
-        }
+  }
+
+  useEffect(() => {
+    fetchCategories();
+  }, []);
+
+  const fetchCategories = async () => {
+    try {
+      const response = await axios.get(`${api}/admin/products/categories`);
+      console.log(response.data)
+      const categoriesData = response.data.categories || response.data;
+      setCategories(categoriesData);
+    } catch (error) {
+      console.error('Failed to fetch categories:', error);
+    }
+  };
+
+
+
+
+  // Extract unique categories, brands, and sizes for filters
+
+  const brands = [...new Set(products.map(product => product.brand.name))];
+  const sizes = [...new Set(products.flatMap(product => product.variants.map(variant => variant.size)))];
+
+  // Function to get lowest price variant for each product
+  const getLowestPrice = (product) => {
+    return Math.min(...product.variants.map(variant => variant.price));
+  };
+
+  // Filter products based on selected filters
+  const filteredProducts = products.filter(product => {
+    // Price filter - check if any variant is within price range
+    const productLowestPrice = getLowestPrice(product);
+    if (productLowestPrice < priceRange[0] || productLowestPrice > priceRange[1]) {
+      return false;
+    }
+
+    // Category filter
+    if (selectedCategories.length > 0 && !selectedCategories.includes(product.category._id)) {
+      return false;
+    }
+
+    // Brand filter
+    if (selectedBrands.length > 0 && !selectedBrands.includes(product.brand.name)) {
+      return false;
+    }
+
+    // Size filter - check if any variant has the selected size
+    if (selectedSizes.length > 0 && !product.variants.some(variant => selectedSizes.includes(variant.size))) {
+      return false;
+    }
+
+    return true;
+  });
+
+  // Sort products based on selected sort option
+  const sortedProducts = [...filteredProducts].sort((a, b) => {
+    switch (sortBy) {
+      case 'price-low':
+        return getLowestPrice(a) - getLowestPrice(b);
+      case 'price-high':
+        return getLowestPrice(b) - getLowestPrice(a);
+      case 'a-z':
+        return a.name.localeCompare(b.name);
+      case 'z-a':
+        return b.name.localeCompare(a.name);
+      default: // newest
+        return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
+    }
+  });
+
+  // // Handle category toggle
+  // const handleCategoryChange = (category) => {
+  //     setSelectedCategories(prev =>
+  //         prev.includes(category)
+  //             ? prev.filter(cat => cat !== category)
+  //             : [...prev, category]
+  //     );
+  // };
+
+  // // Handle brand toggle
+  // const handleBrandChange = (brand) => {
+  //     setSelectedBrands(prev =>
+  //         prev.includes(brand)
+  //             ? prev.filter(b => b !== brand)
+  //             : [...prev, brand]
+  //     );
+  // };
+
+  // Handle size toggle
+  const handleSizeChange = (size) => {
+    setSelectedSizes(prev =>
+      prev.includes(size)
+        ? prev.filter(s => s !== size)
+        : [...prev, size]
+    );
+  };
+
+  // Initialize active images
+  React.useEffect(() => {
+    const initialActiveImages = {};
+    products.forEach(product => {
+      if (product.variants.length > 0) {
+        initialActiveImages[product._id] = product.variants[0].mainImage;
+      }
     });
+    setActiveImage(initialActiveImages);
+  }, []);
 
-    // Handle category toggle
-    const handleCategoryChange = (category) => {
-        setSelectedCategories(prev =>
-            prev.includes(category)
-                ? prev.filter(cat => cat !== category)
-                : [...prev, category]
-        );
-    };
+  // Handle image change for a product
+  const handleImageChange = (productId, imageUrl) => {
+    setActiveImage(prev => ({
+      ...prev,
+      [productId]: imageUrl
+    }));
+  };
 
-    // Handle brand toggle
-    const handleBrandChange = (brand) => {
-        setSelectedBrands(prev =>
-            prev.includes(brand)
-                ? prev.filter(b => b !== brand)
-                : [...prev, brand]
-        );
-    };
+  // Format price in rupees
+  const formatPrice = (price) => {
+    return `₹${(price / 100).toFixed(2)}`;
+  };
 
-    // Custom sidebar content for product listing
-    const sidebarContent = (
-        <>
-            <div className="mb-6">
-                <h3 className="font-semibold text-lg mb-3">Categories</h3>
-                <div className="space-y-2">
-                    {categories.map((category) => (
-                        <div key={category} className="flex items-center">
-                            <input
-                                type="checkbox"
-                                id={`category-${category.toLowerCase()}`}
-                                checked={selectedCategories.includes(category)}
-                                onChange={() => handleCategoryChange(category)}
-                                className="mr-2"
-                            />
-                            <label
-                                htmlFor={`category-${category.toLowerCase()}`}
-                                className="ml-2 text-sm font-medium text-gray-700 cursor-pointer"
-                            >
-                                {category} Jackets
-                            </label>
-                        </div>
-                    ))}
-                </div>
+  // Get all images for a product (main + sub images from first variant with subImages)
+  const getAllImages = (product) => {
+    const variantWithSubImages = product.variants.find(v => v.subImages.length > 0);
+    if (variantWithSubImages) {
+      return [variantWithSubImages.mainImage, ...variantWithSubImages.subImages];
+    }
+    return product.variants.length > 0 ? [product.variants[0].mainImage] : [];
+  };
+
+  // Custom sidebar content for product listing
+  const sidebarContent = (
+    <div className="px-4 py-6">
+      <div className="mb-6">
+        <h3 className="font-semibold text-lg mb-3">Categories</h3>
+        <div className="space-y-2">
+          {categories.map((category) => (
+            <div key={category._id} className="flex items-center">
+              <Checkbox
+                id={`category-${category._id}`}
+                checked={tempCategories.includes(category._id)}
+                onCheckedChange={() => handleCategoryChange(category)}
+              />
+              <label
+                htmlFor={`category-${category._id}`}
+                className="ml-2 text-sm font-medium text-gray-700 cursor-pointer"
+              >
+                {category.name}
+              </label>
             </div>
+          ))}
+        </div>
+      </div>
 
-            <div className="mb-6">
-                <h3 className="font-semibold text-lg mb-3">Price Range</h3>
-                <input
-                    type="range"
-                    min={0}
-                    max={400}
-                    step={10}
-                    value={priceRange[1]}
-                    onChange={(e) => setPriceRange([priceRange[0], parseInt(e.target.value)])}
-                    className="w-full"
-                />
-                <div className="flex justify-between text-sm mt-2">
-                    <span>${priceRange[0]}</span>
-                    <span>${priceRange[1]}</span>
-                </div>
+      <div className="mb-6">
+        <h3 className="font-semibold text-lg mb-3">Price Range</h3>
+        <div className="space-y-4">
+          <div className="flex items-center justify-between">
+            <Input
+              type="number"
+              value={priceRange[0]}
+              onChange={(e) => setPriceRange([Number(e.target.value), priceRange[1]])}
+              className="w-24"
+              min={0}
+              step={100}
+            />
+            <span className="px-2">to</span>
+            <Input
+              type="number"
+              value={priceRange[1]}
+              onChange={(e) => setPriceRange([priceRange[0], Number(e.target.value)])}
+              className="w-24"
+              min={0}
+              step={100}
+            />
+          </div>
+          <div className="text-xs text-gray-500">
+            Prices are in paise (1/100 of a rupee)
+          </div>
+        </div>
+      </div>
+
+      <div className="mb-6">
+        <h3 className="font-semibold text-lg mb-3">Sort By</h3>
+        <Select value={sortBy} onValueChange={(value) => setSortBy(value)}>
+          <SelectTrigger className="w-full">
+            <SelectValue placeholder="Select sort order" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="newest">Newest First</SelectItem>
+            <SelectItem value="price-low">Price: Low to High</SelectItem>
+            <SelectItem value="price-high">Price: High to Low</SelectItem>
+            <SelectItem value="a-z">Name: A to Z</SelectItem>
+            <SelectItem value="z-a">Name: Z to A</SelectItem>
+          </SelectContent>
+        </Select>
+      </div>
+
+      <div className="mb-6">
+        <h3 className="font-semibold text-lg mb-3">Brands</h3>
+        <div className="space-y-2">
+          {brands.map((brand) => (
+            <div key={brand} className="flex items-center">
+              <Checkbox
+                id={`brand-${brand.toLowerCase().replace(/\s+/g, '-')}`}
+                checked={selectedBrands.includes(brand)}
+                onCheckedChange={() => handleBrandChange(brand)}
+              />
+              <label
+                htmlFor={`brand-${brand.toLowerCase().replace(/\s+/g, '-')}`}
+                className="ml-2 text-sm font-medium text-gray-700 cursor-pointer"
+              >
+                {brand}
+              </label>
             </div>
+          ))}
+        </div>
+      </div>
 
-            <div className="mb-6">
-                <h3 className="font-semibold text-lg mb-3">Sort By</h3>
-                <select
-                    className="w-full p-2 border rounded"
-                    value={sortBy}
-                    onChange={(e) => setSortBy(e.target.value)}
-                >
-                    <option value="newest">Newest First</option>
-                    <option value="price-low">Price: Low to High</option>
-                    <option value="price-high">Price: High to Low</option>
-                    <option value="a-z">Name: A to Z</option>
-                    <option value="z-a">Name: Z to A</option>
-                    <option value="popular">Popularity</option>
-                    <option value="rating">Average Rating</option>
-                    <option value="featured">Featured</option>
-                </select>
-            </div>
-
-            <div className="mb-6">
-                <h3 className="font-semibold text-lg mb-3">Brands</h3>
-                <div className="space-y-2">
-                    {brands.map((brand) => (
-                        <div key={brand} className="flex items-center">
-                            <input
-                                type="checkbox"
-                                id={`brand-${brand.toLowerCase().replace(' ', '-')}`}
-                                checked={selectedBrands.includes(brand)}
-                                onChange={() => handleBrandChange(brand)}
-                                className="mr-2"
-                            />
-                            <label
-                                htmlFor={`brand-${brand.toLowerCase().replace(' ', '-')}`}
-                                className="ml-2 text-sm font-medium text-gray-700 cursor-pointer"
-                            >
-                                {brand}
-                            </label>
-                        </div>
-                    ))}
-                </div>
-            </div>
-
+      <div className="mb-6">
+        <h3 className="font-semibold text-lg mb-3">Size</h3>
+        <div className="grid grid-cols-4 gap-2">
+          {sizes.map((size) => (
             <Button
-                className="w-full mt-4"
-                onClick={() => {
-                    setPriceRange([0, 400]);
-                    setSelectedCategories([]);
-                    setSelectedBrands([]);
-                    setSortBy('newest');
-                }}
+              key={size}
+              variant={selectedSizes.includes(size) ? "default" : "outline"}
+              className="h-10 w-full"
+              onClick={() => handleSizeChange(size)}
             >
-                Clear Filters
+              {size}
             </Button>
-        </>
-    );
+          ))}
+        </div>
+      </div>
 
-    return (
-        <Layout showSidebar={true} sidebarContent={sidebarContent}>
-            <div className="mb-4">
-                <h1 className="text-3xl font-bold mb-2">All Jackets</h1>
-                <p className="text-gray-600">
-                    {sortedProducts.length} products found
-                </p>
-            </div>
+      <div className="space-y-2">
+        <Button
+          className="w-full bg-gray-300"
+          onClick={handleApplyFilters}
+        >
+          Apply Filters
+        </Button>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-                {sortedProducts.map((product) => (
-                    <Card key={product.id} className="overflow-hidden hover:shadow-md transition-shadow duration-300">
-                        <div className="relative pb-[125%] overflow-hidden">
-                            <img
-                                src={product.image}
-                                alt={product.name}
-                                className="absolute inset-0 w-full h-full object-cover hover:scale-105 transition-transform duration-300"
-                            />
-                            {product.isNew && (
-                                <span className="absolute top-2 right-2 bg-primary text-white text-xs font-semibold px-2.5 py-1 rounded">New</span>
-                            )}
-                        </div>
+        <Button
+          className="w-full mt-4"
+          onClick={handleClearFilters}
+        >
+          Clear Filters
+        </Button>
+      </div>
+    </div>
+  );
 
-                        <div className="p-4">
-                            <div className="flex items-center mb-1">
-                                <span className="text-xs font-medium text-gray-500">{product.brand}</span>
-                                <span className="mx-2">•</span>
-                                <span className="text-xs font-medium text-gray-500">{product.category}</span>
-                            </div>
+  return (
+    <Layout showSidebar={true} sidebarContent={sidebarContent}>
+      <div className="container mx-auto px-4 py-8">
+        <div className="mb-8">
+          <h1 className="text-3xl font-bold mb-2">All Jackets</h1>
+          <p className="text-gray-600">
+            {sortedProducts.length} products found
+          </p>
+        </div>
 
-                            <h3 className="font-semibold text-lg mb-1 truncate">{product.name}</h3>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+          {sortedProducts.map((product) => {
+            const images = getAllImages(product);
+            const lowestPrice = getLowestPrice(product);
+            const availableSizes = [...new Set(product.variants.map(v => v.size))];
 
-                            <div className="flex items-center mb-2">
-                                <div className="flex items-center">
-                                    <Star className="h-4 w-4 text-yellow-400 fill-yellow-400" />
-                                    <span className="ml-1 text-sm font-medium">{product.rating}</span>
-                                </div>
-                            </div>
-
-                            <div className="flex justify-between items-center mt-3">
-                                <span className="font-bold text-lg">${product.price.toFixed(2)}</span>
-                                <div className="flex space-x-2">
-                                    <Button size="icon" variant="outline" className="h-8 w-8">
-                                        <Heart className="h-4 w-4" />
-                                    </Button>
-                                    <Button size="sm" className="h-8">
-                                        <ShoppingCart className="h-4 w-4 mr-1" />
-                                        Add
-                                    </Button>
-                                </div>
-                            </div>
-                        </div>
-                    </Card>
-                ))}
-            </div>
-
-            {sortedProducts.length === 0 && (
-                <div className="text-center py-12">
-                    <h3 className="text-lg font-semibold mb-2">No products found</h3>
-                    <p className="text-gray-600">Try adjusting your filters to find products.</p>
+            return (
+              <Card key={product._id} className="overflow-hidden hover:shadow-md transition-shadow duration-300">
+                <div className="relative pb-[125%] overflow-hidden">
+                  <img
+                    src={activeImage[product._id] || (product.variants[0]?.mainImage || '')}
+                    alt={product.name}
+                    className="absolute inset-0 w-full h-full object-cover hover:scale-105 transition-transform duration-300"
+                  />
                 </div>
-            )}
-        </Layout>
-    );
+
+                {/* Thumbnail images */}
+                {images.length > 1 && (
+                  <div className="flex gap-2 p-2 overflow-x-auto">
+                    {images.slice(0, 4).map((img, index) => (
+                      <div
+                        key={index}
+                        className={cn(
+                          "h-16 w-16 flex-shrink-0 cursor-pointer border-2 rounded",
+                          activeImage[product._id] === img ? "border-primary" : "border-transparent"
+                        )}
+                        onClick={() => handleImageChange(product._id, img)}
+                      >
+                        <img
+                          src={img}
+                          alt={`${product.name} thumbnail ${index}`}
+                          className="h-full w-full object-cover rounded"
+                        />
+                      </div>
+                    ))}
+                    {images.length > 4 && (
+                      <div className="h-16 w-16 flex-shrink-0 flex items-center justify-center bg-gray-100 text-gray-600 rounded">
+                        +{images.length - 4}
+                      </div>
+                    )}
+                  </div>
+                )}
+
+                <div className="p-4">
+                  <div className="flex items-center mb-1">
+                    <span className="text-xs font-medium text-gray-500">{product.brand.name}</span>
+                    <span className="mx-2">•</span>
+                    <span className="text-xs font-medium text-gray-500">{product.category.name}</span>
+                  </div>
+
+                  <h3 className="font-semibold text-lg mb-2 line-clamp-2">{product.name}</h3>
+
+                  <p className="text-sm text-gray-600 mb-3 line-clamp-2">{product.description}</p>
+
+                  <div className="flex flex-wrap gap-1 mb-3">
+                    {availableSizes.map(size => (
+                      <span key={size} className="text-xs bg-gray-100 px-2 py-1 rounded">
+                        {size}
+                      </span>
+                    ))}
+                  </div>
+
+                  <div className="flex justify-between items-center mt-3">
+                    <span className="font-bold text-lg">{formatPrice(lowestPrice)}</span>
+                    <div className="flex space-x-2">
+                      <Button size="icon" variant="outline" className="h-8 w-8">
+                        <Heart className="h-4 w-4" />
+                      </Button>
+                      <Button size="sm" className="h-8">
+                        <ShoppingCart className="h-4 w-4 mr-1" />
+                        Add
+                      </Button>
+                    </div>
+                  </div>
+                </div>
+              </Card>
+            );
+          })}
+        </div>
+
+        {sortedProducts.length === 0 && (
+          <div className="text-center py-12">
+            <h3 className="text-lg font-semibold mb-2">No products found</h3>
+            <p className="text-gray-600">Try adjusting your filters to find products.</p>
+          </div>
+        )}
+      </div>
+    </Layout>
+  );
 };
 
 export default ProductListing;
