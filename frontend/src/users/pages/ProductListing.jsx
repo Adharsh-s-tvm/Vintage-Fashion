@@ -13,7 +13,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '../../ui/select';
-import { useSearchParams } from 'react-router';
+import { useSearchParams, useNavigate } from 'react-router';
 import { api } from '../../lib/api';
 import axios from 'axios';
 import { Categories } from '../layout/Categories';
@@ -71,7 +71,7 @@ const ProductListing = () => {
   const [totalPages, setTotalPages] = useState(1);
   const [itemsPerPage] = useState(4); // Number of products per page
 
-
+  const navigate = useNavigate();
 
   const fetchProducts = async (params) => {
     try {
@@ -490,6 +490,10 @@ const ProductListing = () => {
     return items;
   };
 
+  const handleProductClick = (productId) => {
+    navigate(`/products/${productId}`);
+  };
+
   return (
     <Layout showSidebar={true} sidebarContent={sidebarContent}>
 
@@ -508,7 +512,11 @@ const ProductListing = () => {
             const availableSizes = [...new Set(product.variants.map(v => v.size))];
 
             return (
-              <Card key={product._id} className="overflow-hidden hover:shadow-md transition-shadow duration-300">
+              <Card
+                key={product._id}
+                className="overflow-hidden hover:shadow-md transition-shadow duration-300 cursor-pointer"
+                onClick={() => handleProductClick(product._id)}
+              >
                 <div className="relative pb-[125%] overflow-hidden">
                   <img
                     src={activeImage[product._id] || (product.variants[0]?.mainImage || '')}

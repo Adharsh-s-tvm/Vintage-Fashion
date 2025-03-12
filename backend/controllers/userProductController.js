@@ -176,3 +176,63 @@ export const getAllShopBrands = async (req, res) => {
     const brands = await Brand.find().sort({ createdAt: -1 });
     res.status(200).json(brands);
 };
+
+export const getProductById = async (req, res) => {
+    try {
+        const { id } = req.params;
+
+        const aggregationPipeline = [
+            {
+                $match: { _id: new mongoose.Types.ObjectId(id) }
+            },
+            {
+                $lookup: {
+                    from: 'variants',
+                    localField: 'variants',
+                    foreignField: '_id',
+                    as: 'variants'
+                }
+            },
+            {
+                $lookup: {
+                    from: 'categories',
+                    localField: 'category',
+                    foreignField: '_id',
+                    as: 'category'
+                }
+            },
+            {
+                $lookup: {
+                    from: 'brands',
+                    localField: 'brand',
+                    foreignField: '_id',
+                    as: 'brand'
+                }
+            },
+            {
+                $unwind: '$category'
+            },
+            {
+                $unwind: '$brand'
+            }
+        ];
+
+        const product = await Product.aggregate(aggregationPipeline);
+
+        if (!product || product.length === 0) {
+            return res.status(404).json({ message: 'Product not found' });
+        }
+
+        res.status(200).json({
+            success: true,
+            product: product[0]
+        });
+
+    } catch (error) {
+        console.error('Error fetching product:', error);
+        res.status(500).json({
+            success: false,
+            message: 'Error fetching product details'
+        });
+    }
+};
