@@ -71,6 +71,26 @@ export default function ProductDetail() {
     }
   }, [selectedSize, product]);
 
+  const getProductImages = (product) => {
+    if (!product || !product.variants || product.variants.length === 0) return [];
+
+    // Get the first variant that has images
+    const primaryVariant = product.variants[0];
+    const images = [];
+
+    // Add main image
+    if (primaryVariant.mainImage) {
+      images.push(primaryVariant.mainImage);
+    }
+
+    // Add up to 3 sub images
+    if (primaryVariant.subImages && primaryVariant.subImages.length > 0) {
+      images.push(...primaryVariant.subImages.slice(0, 3));
+    }
+
+    return images;
+  };
+
   const getAllImages = (product) => {
     if (!product) return [];
     const allImages = product.variants.reduce((images, variant) => {
@@ -106,7 +126,7 @@ export default function ProductDetail() {
     );
   }
 
-  const images = getAllImages(product);
+  const productImages = getProductImages(product);
   const availableSizes = getAvailableSizes(product);
 
   const handleAddToCart = () => {
@@ -142,28 +162,31 @@ export default function ProductDetail() {
           <div className="space-y-4">
             <div className="aspect-square overflow-hidden rounded-lg bg-gray-100">
               <img
-                src={selectedVariant?.mainImage || images[selectedImage]}
+                src={productImages[selectedImage]}
                 alt={product.name}
                 className="h-full w-full object-cover object-center"
               />
             </div>
 
-            <div className="grid grid-cols-4 gap-2">
-              {images.map((image, i) => (
-                <button
-                  key={i}
-                  className={`aspect-square rounded-md overflow-hidden bg-gray-100 
-                    ${i === selectedImage ? 'ring-2 ring-primary' : ''}`}
-                  onClick={() => setSelectedImage(i)}
-                >
-                  <img
-                    src={image}
-                    alt={`${product.name} ${i + 1}`}
-                    className="h-full w-full object-cover object-center"
-                  />
-                </button>
-              ))}
-            </div>
+            {/* Thumbnail images */}
+            {productImages.length > 1 && (
+              <div className="grid grid-cols-4 gap-2">
+                {productImages.map((image, i) => (
+                  <button
+                    key={i}
+                    className={`aspect-square rounded-md overflow-hidden bg-gray-100 
+                      ${i === selectedImage ? 'ring-2 ring-primary' : ''}`}
+                    onClick={() => setSelectedImage(i)}
+                  >
+                    <img
+                      src={image}
+                      alt={`${product.name} ${i + 1}`}
+                      className="h-full w-full object-cover object-center"
+                    />
+                  </button>
+                ))}
+              </div>
+            )}
           </div>
 
           {/* Product Details */}
