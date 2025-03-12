@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Input } from '../../ui/Input';
 import { Button } from '../../ui/Button';
 import { Label } from '../../ui/Label';
@@ -17,32 +17,47 @@ export default function SignIn() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
+  // Add effect to check authentication status
+  useEffect(() => {
+    const token = localStorage.getItem('jwt');
+    if (token) {
+      // User is already logged in, redirect to home page
+      navigate('/');
+      toast.info('You are already logged in');
+    }
+  }, [navigate]);
 
-const handleSubmit = async (e) => {
-        e.preventDefault();
-        try {
-            setIsLoading(true);
-            const data = await loginUser(email, password);
-            console.log('Login Data:', data);
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    try {
+      setIsLoading(true);
+      const data = await loginUser(email, password);
+      console.log('Login Data:', data);
 
-            if (data) {
-                dispatch(setUserInfo(data));
-                localStorage.setItem('userInfo', JSON.stringify(data));
-                if (data.token) {
-                    localStorage.setItem('jwt', data.token);
-                }
-
-                toast.success('Successfully signed in!');
-                navigate('/');
-            } else {
-                throw new Error('Login failed: No data received');
-            }
-        } catch (error) {
-            toast.error('Login failed: ' + error.response?.data?.message || error.message);
-        } finally {
-            setIsLoading(false);
+      if (data) {
+        dispatch(setUserInfo(data));
+        localStorage.setItem('userInfo', JSON.stringify(data));
+        if (data.token) {
+          localStorage.setItem('jwt', data.token);
         }
-    };
+
+        toast.success('Successfully signed in!');
+        navigate('/');
+      } else {
+        throw new Error('Login failed: No data received');
+      }
+    } catch (error) {
+      toast.error('Login failed: ' + error.response?.data?.message || error.message);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  // Add early return if there's a token
+  const token = localStorage.getItem('jwt');
+  if (token) {
+    return null; // Or you could return a loading spinner if needed
+  }
 
   return (
     <div className="flex items-center justify-center min-h-[80vh]">
