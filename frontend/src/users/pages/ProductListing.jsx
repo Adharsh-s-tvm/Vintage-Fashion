@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Layout } from '../layout/Layout';
 import { Card } from '../../ui/card';
 import { Button } from '../../ui/button';
-import { ShoppingCart, Heart, Star, ChevronLeft, ChevronRight } from 'lucide-react';
+import { ShoppingCart, Heart, Star, ChevronLeft, ChevronRight, Search, X } from 'lucide-react';
 import { cn } from '../../lib/util';
 import { Input } from '../../ui/input';
 import { Checkbox } from '../../ui/Checkbox';
@@ -72,6 +72,10 @@ const ProductListing = () => {
   const [itemsPerPage] = useState(4); // Number of products per page
 
   const navigate = useNavigate();
+
+  // Add this new state for search
+  const [searchQuery, setSearchQuery] = useState(searchParams.get('search') || '');
+  const [debouncedSearchQuery, setDebouncedSearchQuery] = useState(searchQuery);
 
   const fetchProducts = async (params) => {
     try {
@@ -221,6 +225,19 @@ const ProductListing = () => {
 
   // Filter products based on selected filters
   const filteredProducts = products.filter(product => {
+    // Search filter
+    if (searchQuery) {
+      const searchLower = searchQuery.toLowerCase();
+      const matchesName = product.name.toLowerCase().includes(searchLower);
+      const matchesDescription = product.description.toLowerCase().includes(searchLower);
+      const matchesBrand = product.brand.name.toLowerCase().includes(searchLower);
+      const matchesCategory = product.category.name.toLowerCase().includes(searchLower);
+
+      if (!(matchesName || matchesDescription || matchesBrand || matchesCategory)) {
+        return false;
+      }
+    }
+
     // Price filter
     const productLowestPrice = getLowestPrice(product);
     if (productLowestPrice < priceRange[0] || productLowestPrice > priceRange[1]) {
@@ -494,10 +511,67 @@ const ProductListing = () => {
     navigate(`/products/${productId}`);
   };
 
+  // Add this useEffect for debouncing search
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      if (searchQuery !== debouncedSearchQuery) {
+        setDebouncedSearchQuery(searchQuery);
+        const params = new URLSearchParams(searchParams);
+        if (searchQuery) {
+          params.set('search', searchQuery);
+        } else {
+          params.delete('search');
+        }
+        setSearchParams(params);
+      }
+    }, 500); // 500ms delay
+
+    return () => clearTimeout(timer);
+  }, [searchQuery]);
+
+  // Add this function to handle search clear
+  const handleClearSearch = () => {
+    setSearchQuery('');
+    const params = new URLSearchParams(searchParams);
+    params.delete('search');
+    setSearchParams(params);
+  };
+
   return (
     <Layout showSidebar={true} sidebarContent={sidebarContent}>
-
       <div className="container mx-auto px-4 py-8">
+        <div className="mb-6">
+          <div className="relative">
+            <Input
+              type="text"
+              placeholder="Search products..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className={`w-full ${searchQuery ? 'pl-4 pr-10' : 'pl-10 pr-4'}`}
+            />
+            {!searchQuery && (
+              <Search
+                className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400"
+              />
+            )}
+            {searchQuery && (
+              <button
+                onClick={handleClearSearch}
+                className="absolute right-3 top-1/2 transform -translate-y-1/2 hover:text-gray-700"
+              >
+                <X className="h-4 w-4 text-gray-400 hover:text-gray-700" />
+              </button>
+            )}
+          </div>
+        </div>
+
+        {/* Show search results message when searching */}
+        {searchQuery && (
+          <div className="mb-4 text-sm text-gray-600">
+            Found {filteredProducts.length} results for "{searchQuery}"
+          </div>
+        )}
+
         <div className="mb-8">
           <h1 className="text-3xl font-bold mb-2">All Jackets</h1>
           <p className="text-gray-600">
@@ -619,10 +693,9 @@ const ProductListing = () => {
         )}
 
       </div>
-
-
     </Layout>
   );
 };
 
 export default ProductListing;
+
