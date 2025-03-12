@@ -35,6 +35,8 @@ export default function ProductDetail() {
   const [selectedVariant, setSelectedVariant] = useState(null);
   const [quantity, setQuantity] = useState(1);
   const [loading, setLoading] = useState(true);
+  const [isHovering, setIsHovering] = useState(false);
+  const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
 
   useEffect(() => {
     const fetchProduct = async () => {
@@ -106,6 +108,14 @@ export default function ProductDetail() {
     return [...new Set(product.variants.map(variant => variant.size))];
   };
 
+  // Add this function to handle mouse movement
+  const handleMouseMove = (e) => {
+    const { left, top, width, height } = e.target.getBoundingClientRect();
+    const x = ((e.pageX - left) / width) * 100;
+    const y = ((e.pageY - top) / height) * 100;
+    setMousePosition({ x, y });
+  };
+
   if (loading) {
     return (
       <Layout>
@@ -160,12 +170,28 @@ export default function ProductDetail() {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
           {/* Product Images */}
           <div className="space-y-4">
-            <div className="aspect-square overflow-hidden rounded-lg bg-gray-100">
+            <div
+              className="aspect-square overflow-hidden rounded-lg bg-gray-100 relative"
+              onMouseEnter={() => setIsHovering(true)}
+              onMouseLeave={() => setIsHovering(false)}
+              onMouseMove={handleMouseMove}
+            >
               <img
                 src={productImages[selectedImage]}
                 alt={product.name}
                 className="h-full w-full object-cover object-center"
               />
+              {isHovering && (
+                <div
+                  className="absolute top-0 left-0 w-full h-full pointer-events-none"
+                  style={{
+                    background: `url(${productImages[selectedImage]}) no-repeat`,
+                    backgroundPosition: `${mousePosition.x}% ${mousePosition.y}%`,
+                    backgroundSize: '200%',
+                    zIndex: 10
+                  }}
+                />
+              )}
             </div>
 
             {/* Thumbnail images */}
